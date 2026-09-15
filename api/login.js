@@ -22,7 +22,7 @@ export default async function handler(request) {
 
   const form = await request.formData();
   const submitted = String(form.get('password') || '');
-  const redirectTo = safeRedirect(form.get('redirect'));
+  const redirectTo = safeRedirect(form.get('redirect'), request.url);
 
   if (!timingSafeEqual(submitted, password)) {
     const failUrl = new URL('/login.html', request.url);
