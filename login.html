@@ -455,8 +455,15 @@
   <script>
     var params = new URLSearchParams(window.location.search);
     var redirectParam = params.get('redirect');
-    if (redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//') && !redirectParam.includes('://')) {
-      document.getElementById('redirect-field').value = redirectParam;
+    if (redirectParam && redirectParam.startsWith('/')) {
+      try {
+        var redirectUrl = new URL(redirectParam, window.location.origin);
+        if (redirectUrl.origin === window.location.origin) {
+          document.getElementById('redirect-field').value = redirectUrl.pathname + redirectUrl.search + redirectUrl.hash;
+        }
+      } catch (error) {
+        // Keep the default same-origin destination.
+      }
     }
     if (params.get('error') === '1') {
       document.getElementById('login-error').style.display = 'flex';
