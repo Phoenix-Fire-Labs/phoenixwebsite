@@ -22,7 +22,7 @@ export default async function handler(request) {
 
   const form = await request.formData();
   const submitted = String(form.get('password') || '');
-  const redirectTo = safeRedirect(form.get('redirect'), request.url);
+  const redirectTo = safeRedirect(form.get('redirect'));
 
   if (!timingSafeEqual(submitted, password)) {
     const failUrl = new URL('/login.html', request.url);
@@ -45,18 +45,11 @@ export default async function handler(request) {
   return response;
 }
 
-function safeRedirect(value, requestUrl) {
-  if (typeof value !== 'string' || !value.startsWith('/')) {
+function safeRedirect(value) {
+  if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || value.includes('://')) {
     return '/';
   }
-  try {
-    const baseUrl = new URL(requestUrl);
-    const resolvedUrl = new URL(value, baseUrl);
-    if (resolvedUrl.origin !== baseUrl.origin) return '/';
-    return resolvedUrl.pathname + resolvedUrl.search + resolvedUrl.hash;
-  } catch {
-    return '/';
-  }
+  return value;
 }
 
 async function sign(value, secret) {
