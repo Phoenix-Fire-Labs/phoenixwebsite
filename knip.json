@@ -1,0 +1,24 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/app/**/{page,layout,route,sitemap,robots,opengraph-image,not-found,error}.{ts,tsx}",
+    "e2e/**/*.ts",
+    "src/**/*.test.ts",
+    "scripts/*.mjs",
+    "tools/**/*.ts"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "e2e/**/*.ts",
+    "scripts/*.mjs"
+  ],
+  "ignoreDependencies": [
+    "tailwindcss",
+    "@eslint/js",
+    "eslint",
+    "typescript-eslint",
+    "react-doctor",
+    "madge",
+    "publint"
+  ]
+}

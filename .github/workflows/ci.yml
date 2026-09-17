@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Before setup-node: package.json pins "packageManager": "yarn@4.18.0",
+      # and setup-node's `cache: yarn` shells out to the global yarn (1.22) to
+      # find the cache directory, which refuses to run without Corepack.
+      - run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - run: yarn install --immutable
+      - run: yarn lint
+      - run: yarn typecheck
+      - run: yarn vitest run --reporter=junit --outputFile=junit-unit.xml
+      - run: NEXT_PUBLIC_JSONLD_HASH=$(node scripts/jsonld-hash.mjs) yarn build
+
+      # `trace` is a Python tool, not a dev dependency, so it has to be
+      # installed explicitly. Pinned to the version the markers were authored
+      # against; an unpinned install would let a new release change the gate.
+      - uses: astral-sh/setup-uv@v5
+      - run: uv tool install tracelayer==0.9.1
+      - run: rm -f tsconfig.tsbuildinfo && trace verify --changed
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-unit
+          path: junit-unit.xml
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: next-build
+          path: .next
+          retention-days: 7
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+      - run: yarn install --immutable
+      - run: npx playwright install chromium --with-deps
+
+      # No build step here: playwright.config.ts runs `yarn build && yarn start`
+      # in its webServer, so building again would double the job time and risk
+      # testing a different artifact than the one the suite serves.
+      - run: PLAYWRIGHT_BROWSERS_PATH=~/.cache/ms-playwright PLAYWRIGHT_JUNIT_OUTPUT_NAME=junit-e2e.xml yarn playwright test --reporter=junit
+
+      # .trace/policy.toml sets require_test_pass = true, so merge-grade
+      # verification needs the suites' outcomes bound to this commit. Without
+      # ingestion the gate can never be satisfied from CI, which made it
+      # unenforceable exactly where it matters.
+      - uses: actions/download-artifact@v4
+        with:
+          name: junit-unit
+
+      - uses: astral-sh/setup-uv@v5
+      - run: uv tool install tracelayer==0.9.1
+      - run: node scripts/evidence.mjs "$GITHUB_SHA" junit-unit.xml junit-e2e.xml
+      - run: trace evidence ingest --normalized evidence.json --revision "$GITHUB_SHA" --provider github-actions --workflow ci
+      - run: trace verify --lifecycle merge
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 14

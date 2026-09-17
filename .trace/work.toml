@@ -1,0 +1,20 @@
+[work."WORK-TL-001"]
+title = "Enforce first-marker traceability"
+[work."WORK-PHO-MB4M5AH6"]
+title = "Phoenix multi-product migration"
+status = "active"
+origin.source = "new_feature"
+origin.intent = "Migrate static site to Next.js and present Phoenix as a multi-product system with hardened preview gate."
+origin.session = "default"
+[work."WORK-PHO-18KENMFK"]
+title = "Phoenix finish: polish story pipeline resources launch"
+status = "done"
+origin.source = "feature_extension"
+origin.intent = "Finish the Phoenix v2 spec: full visual polish, GSAP signature story, briefing pipeline, resources library, launch path."
+origin.session = "default"
+[work."WORK-PHO-32N4ZH5K"]
+title = "Phoenix product IA, system map, and design-scale standardization"
+status = "done"
+origin.source = "behavior_change"
+origin.intent = "Readers cannot tell what Phoenix actually sells: the homepage says 'two systems' while six products exist, Raven and Albatross appear without context, and only Mockingbird and Osprey have pages. Present the full product family as one legible system, give every product a page, and put the site on a single spacing and type scale."
+origin.session = "default"
