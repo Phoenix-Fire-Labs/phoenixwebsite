@@ -23,7 +23,7 @@ export const SOLUTIONS: Solution[] = [
     systems: [
       { name: "Mockingbird", href: "/mockingbird", role: "Reads tactical VHF and extracts units, locations, and events." },
       { name: "Osprey", href: "/osprey", role: "Holds the live picture: perimeter, evacuations, infrastructure, imagery." },
-      { name: "Raven", href: "/technology", role: "Keeps both on the same operational world, with provenance." },
+      { name: "Raven", href: "/raven", role: "Keeps both on the same operational world, with provenance." },
     ],
     outcomes: [
       "Field reports reach the map without a manual relay step.",
@@ -41,8 +41,8 @@ export const SOLUTIONS: Solution[] = [
       "The situation unit spends the planning cycle gathering the same layers from the same separate systems and reconciling them by hand, which leaves less time for the analysis the plan actually depends on.",
     systems: [
       { name: "Osprey", href: "/osprey", role: "Assembles the layers the plan is drawn against." },
-      { name: "Raven", href: "/technology", role: "Holds operational state over time, so change is visible, not inferred." },
-      { name: "Albatross", href: "/technology#albatross", role: "Prediction modeling. In development, not deployed." },
+      { name: "Raven", href: "/raven", role: "Holds operational state over time, so change is visible, not inferred." },
+      { name: "Albatross", href: "/albatross", role: "Prediction modeling. In development, not deployed." },
     ],
     outcomes: [
       "Less of the planning cycle spent assembling, more spent deciding.",
@@ -60,7 +60,7 @@ export const SOLUTIONS: Solution[] = [
       "Utility wildfire teams need fire state, evacuation boundaries, and their own asset and de-energization footprint on one map during an event — and normally maintain that correlation manually, under time pressure, across organizations.",
     systems: [
       { name: "Osprey", href: "/osprey", role: "Infrastructure and evacuation overlays against live fire state." },
-      { name: "Raven", href: "/technology", role: "Relates assets, zones, incidents, and observations over time." },
+      { name: "Raven", href: "/raven", role: "Relates assets, zones, incidents, and observations over time." },
       { name: "Mockingbird", href: "/mockingbird", role: "Adds field intelligence from tactical traffic where available." },
     ],
     outcomes: [

@@ -44,10 +44,20 @@ export function rateLimited(scope: string, key: string, limit: RateLimit, now = 
 
   const recent = (bucket.get(key) ?? []).filter((at) => at > windowStart);
 
+  // Stop recording once the bucket is full. Appending on every request let a
+  // caller who is already over budget grow the array without bound, which both
+  // wastes memory and makes each later prune more expensive — the opposite of
+  // what a limiter should do under attack.
+  if (recent.length >= limit.max) {
+    bucket.set(key, recent);
+
+    return true;
+  }
+
   recent.push(now);
   bucket.set(key, recent);
 
-  return recent.length > limit.max;
+  return false;
 }
 
 // trace:exempt reason=test-helper

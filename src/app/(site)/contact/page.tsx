@@ -36,6 +36,13 @@ export default async function ContactPage({
       {status?.error === "1" ? (
         <p role="alert">Something needs fixing below. Check each field and try again.</p>
       ) : null}
+      {status?.error === "throttled" ? (
+        <p role="alert">
+          We have had a lot of requests from your network. Wait a few minutes and try again, or
+          email <a href="mailto:founders@phoenixfirelabs.com">founders@phoenixfirelabs.com</a>{" "}
+          directly.
+        </p>
+      ) : null}
       <form method="POST" action="/api/contact" className="gate-form contact-form">
         <label className="gate-label" htmlFor="name">Name</label>
         <input id="name" name="name" placeholder="Alex Reyes" required minLength={2} maxLength={120} autoComplete="name" />

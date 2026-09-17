@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree, Fraunces } from "next/font/google";
 import "./globals.css";
-import { SiteFooter } from "@/components/marketing/SiteFooter";
-import { SiteHeader } from "@/components/marketing/SiteHeader";
 import { RevealController } from "@/components/motion/RevealController";
 
 /** Self-hosted at build time. The previous <link> to fonts.googleapis.com
@@ -97,10 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: JS_ANIM_BOOTSTRAP }} />
       </head>
       <body>
-        <a href="#main" className="skip-link">Skip to content</a>
-        <SiteHeader />
-        <main id="main">{children}</main>
-        <SiteFooter />
+        {children}
         <RevealController />
       </body>
     </html>

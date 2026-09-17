@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { WildfireContourMap } from "@/components/visuals/WildfireContourMap";
 import { safeRedirect } from "@/lib/safe-redirect";
 
@@ -5,9 +6,27 @@ import { safeRedirect } from "@/lib/safe-redirect";
  *  works: safeRedirect returns a path, never an origin. */
 const SITE_ORIGIN_FOR_PARSE = "https://www.phoenixfirelabs.com";
 
-export const metadata = {
+/** The gate must not inherit the site's marketing metadata. The root
+ *  description, keywords and social cards all name the products, so an
+ *  unauthenticated visitor (or anything scraping the page) read the full
+ *  positioning straight out of <head>. Each inherited field is overridden,
+ *  not just the title. */
+export const metadata: Metadata = {
   title: "Private Preview",
+  description: "Private preview. Authorized access only.",
+  keywords: [],
   robots: { index: false, follow: false },
+  openGraph: {
+    title: "Phoenix Fire Labs",
+    description: "Private preview. Authorized access only.",
+    images: [],
+  },
+  twitter: {
+    card: "summary",
+    title: "Phoenix Fire Labs",
+    description: "Private preview. Authorized access only.",
+    images: [],
+  },
 };
 
 // trace:v1 id=impl.login-page work=WORK-PHO-MB4M5AH6 satisfies=REQ-PHO-EM6MDMQA
@@ -22,7 +41,16 @@ export default async function LoginPage({
   const redirect = safeRedirect(params.redirect, SITE_ORIGIN_FOR_PARSE);
 
   return (
-    <section className="hero login-hero">
+    <>
+      <header className="site-header">
+        <span className="logo" aria-label="Phoenix Fire Labs">
+          <img src="/allblack.png" alt="Phoenix Fire Labs" className="logo-img" />
+          <span className="logo-sub">Fire Labs</span>
+        </span>
+        <a href="mailto:founders@phoenixfirelabs.com" className="header-link">Contact</a>
+      </header>
+      <main id="main">
+        <section className="hero login-hero">
       <div className="hero-content">
         <p className="hero-eyebrow">Private Preview</p>
         <h1 className="hero-headline">
@@ -77,6 +105,11 @@ export default async function LoginPage({
           </g>
         </svg>
       </div>
-    </section>
+        </section>
+      </main>
+      <footer className="site-footer login-footer">
+        <span className="footer-copy">&copy; 2026 Phoenix Fire Labs</span>
+      </footer>
+    </>
   );
 }

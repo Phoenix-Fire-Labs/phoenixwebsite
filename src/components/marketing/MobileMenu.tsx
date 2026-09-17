@@ -74,16 +74,40 @@ export function MobileMenu() {
               <div key={group.label} className="mobile-nav-group">
                 <p className="mobile-nav-heading">{group.label}</p>
                 {group.sections.flatMap((s) => s.links).map((link) => (
-                  <Link key={link.href + link.label} href={link.href}>{link.label}</Link>
+                  <Link
+                    key={link.href + link.label}
+                    href={link.href}
+                    onClick={() => {
+                      setOpen(false);
+                    }}
+                  >
+                    {link.label}
+                  </Link>
                 ))}
               </div>
             ))}
             <div className="mobile-nav-group">
-              <Link href={BRIEFING_CTA.href} className="btn btn-primary btn-sm">{BRIEFING_CTA.label}</Link>
+              <Link
+                href={BRIEFING_CTA.href}
+                className="btn btn-primary btn-sm"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                {BRIEFING_CTA.label}
+              </Link>
             </div>
             <div className="mobile-nav-group mobile-nav-legal">
               {FOOTER_LEGAL.map((link) => (
-                <Link key={link.href} href={link.href}>{link.label}</Link>
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                >
+                  {link.label}
+                </Link>
               ))}
             </div>
           </m.nav>

@@ -41,13 +41,30 @@ for (const file of process.argv.slice(3)) {
     if (traceId == null) continue;
 
     const failed = Number(attr(tag, "failures") ?? 0) + Number(attr(tag, "errors") ?? 0);
+    const skipped = Number(attr(tag, "skipped") ?? 0);
+    const total = Number(attr(tag, "tests") ?? 0);
     const prior = results.get(traceId);
-    const outcome = failed > 0 ? "fail" : "pass";
 
-    // A trace node stays "pass" only if every suite mapped to it passed.
+    // A suite that ran nothing, or whose tests were all skipped, is not
+    // evidence of anything. Reporting it as `pass` would let trace record a
+    // verification that never happened.
+    let outcome = "pass";
+
+    if (failed > 0) outcome = "fail";
+    else if (total === 0 || skipped >= total) outcome = "skip";
+
+    // A trace node stays "pass" only if every suite mapped to it passed; a
+    // failure wins over everything, and a skip beats a pass.
+    const merged =
+      prior?.outcome === "fail" || outcome === "fail"
+        ? "fail"
+        : prior?.outcome === "skip" || outcome === "skip"
+          ? "skip"
+          : "pass";
+
     results.set(traceId, {
       framework_id: name,
-      outcome: prior?.outcome === "fail" ? "fail" : outcome,
+      outcome: merged,
       trace_id: traceId,
       duration_ms: Math.round(Number(attr(tag, "time") ?? 0) * 1000),
     });

@@ -310,3 +310,55 @@ test("each route declares its own canonical", async ({ page }) => {
   expect(new Set(values).size, `duplicate canonicals: ${[...seen].map(([r, c]) => `${r}->${c}`).join(", ")}`)
     .toBe(values.length);
 });
+
+test("the gate itself leaks no product information", async ({ page }) => {
+  // /login is the one page a stranger can reach. It used to inherit the
+  // marketing header, footer and metadata, so the whole product family was
+  // readable without authenticating.
+  await page.goto("/login");
+
+  const html = await page.content();
+
+  for (const product of PRODUCTS) {
+    expect(html, `${product.name} is visible on the gate`).not.toContain(product.name);
+  }
+
+  // The gate still has to work.
+  await expect(page.getByRole("button", { name: "Enter Preview" })).toBeVisible();
+});
+
+test("a throttled briefing is reported, not silently dropped", async ({ page }) => {
+  await login(page);
+
+  const session = (await page.context().cookies()).map((c) => `${c.name}=${c.value}`).join("; ");
+
+  const body = {
+    name: "Alex Reyes",
+    agency: "Ridge County Fire",
+    email: "alex@ridgecounty.gov",
+    role: "Battalion Chief",
+    useCase: "incident-command",
+    message: "We run multi-division incidents and need radio-to-map in seconds, not hours.",
+    website: "",
+    startedAt: String(Date.now() - 30_000),
+  };
+
+  // Exhaust the 20-per-10-minute budget, then confirm the next one is refused
+  // rather than answered with a success the requester would believe.
+  let throttled: number | null = null;
+
+  for (let i = 0; i < 24; i++) {
+    const response = await page.request.post("/api/contact", {
+      headers: { Cookie: session, Accept: "application/json", Origin: ORIGIN },
+      form: body,
+    });
+
+    if (response.status() === 429) {
+      throttled = i;
+      expect((await response.json()).ok, "throttled response must not claim success").toBe(false);
+      break;
+    }
+  }
+
+  expect(throttled, "expected a 429 once the budget was exhausted").not.toBeNull();
+});

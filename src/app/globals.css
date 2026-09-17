@@ -2666,3 +2666,12 @@ main > section + section {
     overflow-x: auto;
   }
 }
+
+/* The gate's own footer: one line, no sitemap. The marketing footer listed
+   every product, which is the positioning the gate exists to withhold. */
+/* trace:exempt reason=presentational-utilities */
+.login-footer {
+  display: flex;
+  grid-template-columns: none;
+  justify-content: flex-start;
+}

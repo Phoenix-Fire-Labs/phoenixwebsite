@@ -65,10 +65,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, fields: { form: "Request origin rejected." } }, { status: 403 });
   }
 
+  // Tell a throttled requester the truth. Returning success and dropping the
+  // submission meant someone on a shared address was told "Received" while
+  // their briefing went nowhere — the worst possible outcome for the audience
+  // this form exists to serve. Bots can infer throttling anyway.
   if (rateLimited("contact", clientKey(request), CONTACT_LIMIT, now)) {
-    if (wantsJson(request)) return NextResponse.json({ ok: true }, { status: 200 });
+    if (wantsJson(request)) {
+      return NextResponse.json(
+        { ok: false, fields: { form: "Too many requests from this network. Try again shortly." } },
+        { status: 429, headers: { "Retry-After": "600" } },
+      );
+    }
 
-    return contactRedirect(true);
+    return new Response(null, {
+      status: 303,
+      headers: { Location: "/contact?error=throttled", "Retry-After": "600" },
+    });
   }
 
   const form = await request.formData();
