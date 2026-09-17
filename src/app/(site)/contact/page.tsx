@@ -19,12 +19,14 @@ function renderedAt(): number {
 export default async function ContactPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ sent?: string; error?: string }>;
+  searchParams?: Promise<{ sent?: string; error?: string; fields?: string }>;
 }) {
   const status = await searchParams;
   // Rendered once per request on the server. Kept out of the JSX so the render
   // itself stays pure; the value is the dwell baseline the API compares against.
   const startedAt = renderedAt();
+  // Names of the fields the server rejected, so the banner can say which.
+  const invalidFields = (status?.fields ?? "").split(",").filter((f) => f !== "");
 
   return (
     <section className="page-hero">
@@ -34,7 +36,11 @@ export default async function ContactPage({
         <output>Received. We respond to qualified requests.</output>
       ) : null}
       {status?.error === "1" ? (
-        <p role="alert">Something needs fixing below. Check each field and try again.</p>
+        <p role="alert">
+          {invalidFields.length > 0
+            ? `Check ${invalidFields.join(", ")} and try again.`
+            : "Something needs fixing below. Check each field and try again."}
+        </p>
       ) : null}
       {status?.error === "throttled" ? (
         <p role="alert">

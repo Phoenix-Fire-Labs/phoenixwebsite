@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { canonicalFor } from "@/lib/seo";
 import { SOLUTIONS, findSolution } from "@/content/solutions";
+import { CardGrid } from "@/components/marketing/CardGrid";
+import { productBySlug } from "@/lib/product-status";
 
 // trace:exempt reason=internal-detail -- static params
 export function generateStaticParams() {
@@ -58,16 +60,23 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
           <p className="section-label reveal" data-i="0">What does the work</p>
           <h2 className="section-heading reveal" data-i="1">The systems involved.</h2>
         </div>
-        <div className="card-grid stagger">
-          {solution.systems.map((system, i) => (
-            <article key={system.name} className="card reveal" data-i={i}>
-              <h3 className="card-title">
-                <Link href={system.href}>{system.name}</Link>
-              </h3>
-              <p className="card-summary">{system.role}</p>
-            </article>
-          ))}
-        </div>
+        <CardGrid
+          items={solution.systems.flatMap((system) => {
+            const product = productBySlug(system.slug);
+
+            // A solution referencing a slug the registry does not know is a
+            // content bug; drop it rather than render a dead card.
+            return product == null
+              ? []
+              : [{
+                  id: product.slug,
+                  eyebrow: product.statusLabel,
+                  title: product.name,
+                  href: product.href,
+                  body: system.role,
+                }];
+          })}
+        />
       </section>
 
       <section className="section-pad stagger">

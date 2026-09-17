@@ -24,7 +24,7 @@ jobs:
       - run: yarn install --immutable
       - run: yarn lint
       - run: yarn typecheck
-      - run: yarn test
+      - run: yarn vitest run --reporter=junit --outputFile=junit-unit.xml
       - run: NEXT_PUBLIC_JSONLD_HASH=$(node scripts/jsonld-hash.mjs) yarn build
 
       # `trace` is a Python tool, not a dev dependency, so it has to be
@@ -33,6 +33,13 @@ jobs:
       - uses: astral-sh/setup-uv@v5
       - run: uv tool install tracelayer==0.9.1
       - run: rm -f tsconfig.tsbuildinfo && trace verify --changed
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-unit
+          path: junit-unit.xml
+          retention-days: 7
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -57,7 +64,21 @@ jobs:
       # No build step here: playwright.config.ts runs `yarn build && yarn start`
       # in its webServer, so building again would double the job time and risk
       # testing a different artifact than the one the suite serves.
-      - run: PLAYWRIGHT_BROWSERS_PATH=~/.cache/ms-playwright yarn test:e2e
+      - run: PLAYWRIGHT_BROWSERS_PATH=~/.cache/ms-playwright PLAYWRIGHT_JUNIT_OUTPUT_NAME=junit-e2e.xml yarn playwright test --reporter=junit
+
+      # .trace/policy.toml sets require_test_pass = true, so merge-grade
+      # verification needs the suites' outcomes bound to this commit. Without
+      # ingestion the gate can never be satisfied from CI, which made it
+      # unenforceable exactly where it matters.
+      - uses: actions/download-artifact@v4
+        with:
+          name: junit-unit
+
+      - uses: astral-sh/setup-uv@v5
+      - run: uv tool install tracelayer==0.9.1
+      - run: node scripts/evidence.mjs "$GITHUB_SHA" junit-unit.xml junit-e2e.xml
+      - run: trace evidence ingest --normalized evidence.json --revision "$GITHUB_SHA" --provider github-actions --workflow ci
+      - run: trace verify --lifecycle merge
 
       - uses: actions/upload-artifact@v4
         if: always()

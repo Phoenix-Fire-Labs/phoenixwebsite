@@ -23,7 +23,8 @@ yarn typecheck   # tsc --noEmit
 yarn test        # vitest run (safeRedirect, preview gate, product registry, briefing)
 yarn build       # production build (set NEXT_PUBLIC_JSONLD_HASH first)
 yarn lint        # oxlint (clean on src/scripts; golden-master archive excluded)
-node scripts/preview-hash.mjs '<password>'  # mint PREVIEW_PASSWORD_HASH
+printf %s 'your-password' | node scripts/preview-hash.mjs  # mint PREVIEW_PASSWORD_HASH
+#   (reads stdin so the secret stays out of shell history and ps output)
 node scripts/jsonld-hash.mjs                # recompute the JSON-LD hash after structured-data edits
 #                                            (computed only; see AGENTS.md - it is not enforced in the CSP yet)
 ```

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { validateBriefing, type BriefingInput } from "@/lib/briefing";
 import { clientKey, rateLimited } from "@/lib/rate-limit";
 import { isSameOrigin } from "@/lib/same-origin";
@@ -102,7 +102,14 @@ export async function POST(request: Request) {
   if (!result.ok) {
     if (wantsJson(request)) return NextResponse.json({ ok: false, fields: result.fields }, { status: 400 });
 
-    return contactRedirect(false);
+    // Carry the field names back so the page can mark them, rather than
+    // showing one generic banner for every possible failure.
+    const invalid = Object.keys(result.fields).join(",");
+
+    return new Response(null, {
+      status: 303,
+      headers: { Location: `/contact?error=1&fields=${encodeURIComponent(invalid)}` },
+    });
   }
 
   // Bot-like submissions get the same success response but are never routed.
@@ -133,24 +140,33 @@ export async function POST(request: Request) {
       return contactRedirect(false);
     }
 
-    // trace:exempt reason=internal-detail -- CRM fan-out
-    const crm = process.env.BRIEFING_CRM_URL;
+    // The inbox has accepted the briefing, so the requester is done. CRM and
+    // analytics ran serially before this, each able to consume the full 5s
+    // timeout, which meant two optional sinks could add 10s to a response
+    // that was already successful. `after` runs them once the response has
+    // been sent, and keeps the work alive on serverless rather than having it
+    // cancelled with the invocation.
+    after(async () => {
+      // trace:exempt reason=internal-detail -- CRM fan-out
+      const crm = process.env.BRIEFING_CRM_URL;
 
-    if (crm) {
-      await postJson(crm, {
-        email: result.input.email,
-        agency: result.input.agency,
-        useCase: result.input.useCase,
-        source: "phoenix-briefing",
-      });
-    }
+      // trace:exempt reason=internal-detail -- analytics event
+      const analytics = process.env.BRIEFING_ANALYTICS_URL;
 
-    // trace:exempt reason=internal-detail -- analytics event
-    const analytics = process.env.BRIEFING_ANALYTICS_URL;
-
-    if (analytics) {
-      await postJson(analytics, { event: "briefing_request", useCase: result.input.useCase });
-    }
+      await Promise.allSettled([
+        crm
+          ? postJson(crm, {
+              email: result.input.email,
+              agency: result.input.agency,
+              useCase: result.input.useCase,
+              source: "phoenix-briefing",
+            })
+          : Promise.resolve(true),
+        analytics
+          ? postJson(analytics, { event: "briefing_request", useCase: result.input.useCase })
+          : Promise.resolve(true),
+      ]);
+    });
 
   }
 

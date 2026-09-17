@@ -1,10 +1,30 @@
 // trace:exempt reason=local-dev-script
 import { randomBytes, scryptSync } from "node:crypto";
 
-const password = process.argv[2];
+// argv is visible in `ps` output and lands in shell history, so the password
+// is read from stdin by default. An explicit argv value is still accepted for
+// non-interactive callers (the e2e harness) that use a throwaway secret.
+const fromArgv = process.argv[2];
+
+// trace:exempt reason=local-dev-script
+async function readStdin() {
+  if (process.stdin.isTTY) {
+    process.stderr.write("Preview password (input hidden is not supported here): ");
+  }
+
+  const chunks = [];
+
+  for await (const chunk of process.stdin) chunks.push(chunk);
+
+  return Buffer.concat(chunks).toString("utf8").replace(/\r?\n$/, "");
+}
+
+const password = fromArgv ?? (await readStdin());
 
 if (!password) {
-  console.error("usage: node scripts/preview-hash.mjs <password>");
+  console.error("usage: node scripts/preview-hash.mjs            # reads the password from stdin");
+  console.error("       printf %s 'secret' | node scripts/preview-hash.mjs");
+  console.error("       node scripts/preview-hash.mjs <password>  # argv is visible in ps output");
   process.exit(1);
 }
 
