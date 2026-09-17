@@ -55,7 +55,8 @@ export const metadata: Metadata = {
     process.env.SITE_PREVIEW_GATED !== "false"
       ? { index: false, follow: false }
       : { index: true, follow: true },
-  alternates: { canonical: "https://www.phoenixfirelabs.com/" },
+  // No canonical here: it would be inherited by every route. Each page
+  // declares its own via canonicalFor().
   // No `images` here on purpose: src/app/opengraph-image.tsx generates the
   // card, and Next only uses it when metadata does not override it. The
   // static /og-image.jpg override made that route dead weight.

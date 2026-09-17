@@ -69,7 +69,9 @@ export function RadioToMap() {
 
     observer.observe(scope);
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   // trace:exempt reason=internal-effect -- auto-advance timer
@@ -96,7 +98,9 @@ export function RadioToMap() {
 
     frame = requestAnimationFrame(tick);
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, [advance, inView, picked]);
 
   // trace:exempt reason=internal-effect -- GSAP stage choreography

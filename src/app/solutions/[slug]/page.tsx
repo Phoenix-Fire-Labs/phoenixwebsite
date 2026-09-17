@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { canonicalFor } from "@/lib/seo";
 import { SOLUTIONS, findSolution } from "@/content/solutions";
 
 // trace:exempt reason=internal-detail -- static params
@@ -19,7 +20,11 @@ export async function generateMetadata({
 
   if (!solution) return { title: "Solutions" };
 
-  return { title: `${solution.title} | Wildfire Operations`, description: solution.summary };
+  return {
+    title: `${solution.title} | Wildfire Operations`,
+    description: solution.summary,
+    alternates: canonicalFor(`/solutions/${solution.slug}`),
+  };
 }
 
 // trace:v1 id=impl.solutions-slug work=WORK-PHO-18KENMFK satisfies=REQ-PHO-3KRYSF5K

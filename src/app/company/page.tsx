@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
 import { FoundersTimeline } from "@/components/visuals/FoundersTimeline";
 
 export const metadata: Metadata = {
+  alternates: canonicalFor("/company"),
   title: "Company",
   description:
     "Phoenix Fire Labs builds operational intelligence systems for wildfire response, founded after the Palisades Fire.",

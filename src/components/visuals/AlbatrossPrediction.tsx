@@ -26,7 +26,7 @@ export function AlbatrossPrediction() {
 
       gsap.fromTo(
         path,
-        { strokeDashoffset: length, strokeDasharray: `${length}` },
+        { strokeDashoffset: length, strokeDasharray: String(length) },
         { strokeDashoffset: 0, duration: 1.4, ease: "power2.out" },
       );
     }

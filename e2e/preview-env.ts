@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 export const E2E_ENV_FILE = resolve(process.cwd(), ".env.production.local");
@@ -25,35 +25,43 @@ const MARKER = "# Written by e2e/preview-env.ts for the Playwright run. Removed 
 
 // trace:exempt reason=test-harness
 export function writePreviewEnv() {
-  if (existsSync(E2E_ENV_FILE)) {
-    // Playwright loads this config once per worker as well as in the runner,
-    // so re-seeing our own file is normal; only a real one must stop the run.
-    if (!readFileSync(E2E_ENV_FILE, "utf8").startsWith(MARKER)) {
-      throw new Error(
-        `${E2E_ENV_FILE} already exists. The e2e run needs to own that file; move it aside first.`,
-      );
-    }
-
-    return;
-  }
 
   const hash = execFileSync("node", ["scripts/preview-hash.mjs", E2E_PASSWORD]).toString().trim();
   const jsonld = execFileSync("node", ["scripts/jsonld-hash.mjs"]).toString().trim();
   // trace:exempt reason=internal-detail -- dotenv escaping
   const escape = (value: string) => value.replaceAll("$", "\\$");
 
-  writeFileSync(
-    E2E_ENV_FILE,
-    [
-      MARKER,
-      "SITE_PREVIEW_GATED=true",
-      "PREVIEW_SESSION_SECRET=e2e0123456789abcdef0123456789abcdef",
-      `PREVIEW_PASSWORD_HASH=${escape(hash)}`,
-      `NEXT_PUBLIC_JSONLD_HASH=${escape(jsonld)}`,
-      "BRIEFING_INBOX=",
-      "",
-    ].join("\n"),
-  );
+  const contents = [
+    MARKER,
+    "SITE_PREVIEW_GATED=true",
+    "PREVIEW_SESSION_SECRET=e2e0123456789abcdef0123456789abcdef",
+    `PREVIEW_PASSWORD_HASH=${escape(hash)}`,
+    `NEXT_PUBLIC_JSONLD_HASH=${escape(jsonld)}`,
+    "BRIEFING_INBOX=",
+    "",
+  ].join("\n");
+
+  try {
+    // "wx" creates or fails atomically. Checking existsSync() first left a
+    // window in which the file could appear between the check and the write,
+    // and a developer's real .env.production.local would be clobbered.
+    writeFileSync(E2E_ENV_FILE, contents, { flag: "wx" });
+
+    return;
+  } catch (error) {
+    // SAFETY: writeFileSync rejects with a Node system error, which always
+    // carries `code`; anything else is rethrown untouched on the next line.
+    if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+  }
+
+  // The path existed. Playwright loads this config once per worker as well as
+  // in the runner, so re-seeing our own file is expected; anything else is a
+  // real file we must not touch.
+  if (!readFileSync(E2E_ENV_FILE, "utf8").startsWith(MARKER)) {
+    throw new Error(
+      `${E2E_ENV_FILE} already exists. The e2e run needs to own that file; move it aside first.`,
+    );
+  }
 }
 
 // trace:exempt reason=test-harness

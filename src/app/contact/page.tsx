@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 
 export const metadata: Metadata = {
+  alternates: canonicalFor("/contact"),
   title: "Request a Briefing",
   description:
     "Request a Phoenix Fire Labs briefing for incident command, operations planning, or utility wildfire programs.",
@@ -29,7 +31,7 @@ export default async function ContactPage({
       <p className="hero-eyebrow">Request a Briefing</p>
       <h1>Tell us about your operation.</h1>
       {status?.sent === "1" ? (
-        <p role="status">Received. We respond to qualified requests.</p>
+        <output>Received. We respond to qualified requests.</output>
       ) : null}
       {status?.error === "1" ? (
         <p role="alert">Something needs fixing below. Check each field and try again.</p>

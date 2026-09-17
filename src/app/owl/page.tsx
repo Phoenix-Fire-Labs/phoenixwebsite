@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import { ProductPage } from "@/components/products/ProductPage";
 import { productBySlug } from "@/lib/product-status";
 
 const product = productBySlug("owl")!;
 
 export const metadata: Metadata = {
+  alternates: canonicalFor("/owl"),
   title: "Owl Augmented-Reality Field Interface",
   description: product.blurb,
 };

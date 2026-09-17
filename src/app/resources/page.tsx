@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
 import { GOVERNMENT_SPEND, NATIONAL } from "@/content/resources";
 
 export const metadata: Metadata = {
+  alternates: canonicalFor("/resources"),
   title: "Resources",
   description:
     "Sourced research on wildfire scale, Palisades impact, government operational spend, and the markets adjacent to Phoenix Fire Labs.",

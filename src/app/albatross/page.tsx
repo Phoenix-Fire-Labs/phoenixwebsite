@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import { AlbatrossPrediction } from "@/components/visuals/AlbatrossPrediction";
 import { ProductPage } from "@/components/products/ProductPage";
 import { productBySlug } from "@/lib/product-status";
@@ -6,6 +7,7 @@ import { productBySlug } from "@/lib/product-status";
 const product = productBySlug("albatross")!;
 
 export const metadata: Metadata = {
+  alternates: canonicalFor("/albatross"),
   title: "Albatross Wildfire Prediction Modeling",
   description: product.blurb,
 };

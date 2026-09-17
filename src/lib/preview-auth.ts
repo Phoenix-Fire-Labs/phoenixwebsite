@@ -10,7 +10,7 @@ import { createHmac, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 
 export const PREVIEW_COOKIE_NAME = "__Host-phoenix_preview";
 
-export const PREVIEW_SESSION_MAX_AGE_SECONDS = 24 * 60 * 60;
+const PREVIEW_SESSION_MAX_AGE_SECONDS = 24 * 60 * 60;
 
 // `__Host-` requires Secure, which browsers reject on http://localhost. Plain name for http dev only.
 export const PREVIEW_COOKIE_NAME_HTTP = "phoenix_preview";
@@ -28,7 +28,7 @@ export function previewCookieName(requestUrl?: string | null): string {
 }
 
 // trace:exempt reason=internal-helper
-export function isSecureRequest(requestUrl?: string | null): boolean {
+function isSecureRequest(requestUrl?: string | null): boolean {
   return requestUrl == null || requestUrl.startsWith("https://");
 }
 
@@ -58,7 +58,14 @@ export async function hashPreviewPassword(password: string): Promise<string> {
   const salt = randomBytes(SALT_LEN);
   const key = await scryptKey(password, salt, SCRYPT_N, SCRYPT_R, SCRYPT_P);
 
-  return `scrypt$${SCRYPT_N}$${SCRYPT_R}$${SCRYPT_P}$${salt.toString("hex")}$${key.toString("hex")}`;
+  return [
+    "scrypt",
+    String(SCRYPT_N),
+    String(SCRYPT_R),
+    String(SCRYPT_P),
+    salt.toString("hex"),
+    key.toString("hex"),
+  ].join("$");
 }
 
 // trace:v1 id=impl.preview-auth.verify-password work=WORK-PHO-MB4M5AH6 satisfies=REQ-PHO-EM6MDMQA
@@ -87,7 +94,7 @@ export function createSessionToken(secret: string): string {
   const issuedAt = Date.now();
   const expiresAt = issuedAt + PREVIEW_SESSION_MAX_AGE_SECONDS * 1000;
   const nonce = randomBytes(16).toString("hex");
-  const body = `v1.${issuedAt}.${expiresAt}.${nonce}`;
+  const body = ["v1", String(issuedAt), String(expiresAt), nonce].join(".");
 
   return `${body}.${createHmac("sha256", secret).update(body).digest("hex")}`;
 }
@@ -123,6 +130,6 @@ export function buildSessionCookie(token: string, requestUrl?: string): string {
   // http://localhost rejects Secure cookies, so dev gets the plain name without it.
   return (
     `${name}=${encodeURIComponent(token)}; Path=/; ` +
-    `Max-Age=${PREVIEW_SESSION_MAX_AGE_SECONDS}; HttpOnly;${secure ? " Secure;" : ""} SameSite=Strict`
+    `Max-Age=${String(PREVIEW_SESSION_MAX_AGE_SECONDS)}; HttpOnly;${secure ? " Secure;" : ""} SameSite=Strict`
   );
 }

@@ -44,12 +44,16 @@ function RevealObserver() {
       { threshold: 0.12, rootMargin: "0px 0px -32px 0px" },
     );
 
-    document.querySelectorAll(".reveal:not(.visible)").forEach((el) => seen.observe(el));
+    document.querySelectorAll(".reveal:not(.visible)").forEach((el) => {
+      seen.observe(el);
+    });
 
     // Content can stream in after this effect runs. Watching the tree picks
     // those up whenever they land, instead of guessing at fixed delays.
     const added = new MutationObserver(() => {
-      document.querySelectorAll(".reveal:not(.visible)").forEach((el) => seen.observe(el));
+      document.querySelectorAll(".reveal:not(.visible)").forEach((el) => {
+      seen.observe(el);
+    });
     });
 
     added.observe(document.body, { childList: true, subtree: true });

@@ -274,3 +274,39 @@ test("hero fits the first screen at common window heights", async ({ page }) => 
   await page.goto("/");
   await expect(page.getByRole("link", { name: "Request a Briefing" }).first()).toBeInViewport();
 });
+
+test("the generated social card is not public while gated", async ({ page }) => {
+  // The card renders the headline and the product names, so exempting it from
+  // the gate published exactly the positioning the preview withholds.
+  const response = await page.request.get("/opengraph-image", { maxRedirects: 0 });
+
+  expect(response.status(), "opengraph-image should be gated").toBe(307);
+  expect(response.headers()["location"]).toContain("/login");
+});
+
+test("each route declares its own canonical", async ({ page }) => {
+  await login(page);
+
+  // The root layout used to hard-code the homepage canonical, which Next then
+  // merged into every child route — telling search engines that every page was
+  // a duplicate of /.
+  const seen = new Map<string, string>();
+
+  for (const route of ROUTES) {
+    await page.goto(route);
+
+    const canonical = await page
+      .locator('link[rel="canonical"]')
+      .first()
+      .getAttribute("href");
+
+    expect(canonical, `${route} has no canonical`).not.toBeNull();
+    seen.set(route, canonical!);
+  }
+
+  // No two routes may claim the same canonical URL.
+  const values = [...seen.values()];
+
+  expect(new Set(values).size, `duplicate canonicals: ${[...seen].map(([r, c]) => `${r}->${c}`).join(", ")}`)
+    .toBe(values.length);
+});

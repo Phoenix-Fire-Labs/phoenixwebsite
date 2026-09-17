@@ -38,12 +38,28 @@ print(json.dumps(d))
 PY
 )"
 
+ERRFILE="$(mktemp)"
+trap 'rm -f "$ERRFILE"' EXIT
+
 if command -v trace >/dev/null 2>&1; then
-  OUT="$(printf '%s' "$PAYLOAD" | trace hook "$EVENT" --format json 2>/dev/null)"
+  OUT="$(printf '%s' "$PAYLOAD" | trace hook "$EVENT" --format json 2>"$ERRFILE")"
 else
-  OUT="$(printf '%s' "$PAYLOAD" | uv run trace hook "$EVENT" --format json 2>/dev/null)"
+  OUT="$(printf '%s' "$PAYLOAD" | uv run trace hook "$EVENT" --format json 2>"$ERRFILE")"
 fi
 RC=$?
+
+# Fail CLOSED on anything that is not a clean allow (0) or a policy deny (1).
+# trace exits 2 on config error, 3 when the index is unavailable and 4 on an
+# evidence parse failure; treating those as "allowed" meant a missing or
+# broken `trace` silently disabled enforcement for every edit. The stderr is
+# surfaced rather than swallowed so the cause is visible.
+if [ "$RC" -ne 0 ] && [ "$RC" -ne 1 ]; then
+  DETAIL="$(head -c 500 "$ERRFILE" 2>/dev/null)"
+  [ -n "$DETAIL" ] || DETAIL="trace hook exited $RC with no diagnostic output"
+  REASON_JSON="$(python3 -c 'import json,sys; print(json.dumps("trace enforcement unavailable (exit "+sys.argv[1]+"): "+sys.argv[2]))' "$RC" "$DETAIL")"
+  printf '{"permissionDecision":"deny","permissionDecisionReason":%s}' "$REASON_JSON"
+  exit 0
+fi
 
 if [ "$RC" -eq 1 ]; then
   REASON="$(printf '%s' "$OUT" | python3 -c '

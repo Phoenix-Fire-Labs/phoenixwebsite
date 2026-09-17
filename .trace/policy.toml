@@ -84,6 +84,8 @@ paths = [
   ".pyre_configuration",
   ".github/**",
   ".archive-static-golden-master/**",
+  "vercel.json",
+  "knip.json",
 ]
 extensions = [
 

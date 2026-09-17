@@ -1,6 +1,10 @@
 import { WildfireContourMap } from "@/components/visuals/WildfireContourMap";
 import { safeRedirect } from "@/lib/safe-redirect";
 
+/** Base for resolving the relative redirect reference. Any absolute origin
+ *  works: safeRedirect returns a path, never an origin. */
+const SITE_ORIGIN_FOR_PARSE = "https://www.phoenixfirelabs.com";
+
 export const metadata = {
   title: "Private Preview",
   robots: { index: false, follow: false },
@@ -15,7 +19,7 @@ export default async function LoginPage({
   const params = await searchParams;
   // Same guard the POST handler uses, so the hidden field can never carry a
   // value the server would reject — `startsWith("/")` alone admits `//evil`.
-  const redirect = safeRedirect(params.redirect, "https://www.phoenixfirelabs.com");
+  const redirect = safeRedirect(params.redirect, SITE_ORIGIN_FOR_PARSE);
 
   return (
     <section className="hero login-hero">

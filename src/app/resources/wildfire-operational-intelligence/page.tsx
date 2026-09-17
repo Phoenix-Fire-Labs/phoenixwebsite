@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
 import {
   ADJACENT_MARKETS,
@@ -10,6 +11,7 @@ import {
 } from "@/content/resources";
 
 export const metadata: Metadata = {
+  alternates: canonicalFor("/resources/wildfire-operational-intelligence"),
   title: "Wildfire Operational Intelligence",
   description:
     "Sourced figures on Palisades damage, national wildfire scale, government spend, adjacent markets, and TAM sensitivity.",

@@ -38,7 +38,9 @@ export function MobileMenu() {
 
     window.addEventListener("keydown", onKey);
 
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+    };
   }, [isOpen]);
 
   return (
@@ -48,7 +50,9 @@ export function MobileMenu() {
         className="mobile-menu-toggle"
         aria-expanded={isOpen}
         aria-controls="mobile-nav"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          setOpen((value) => !value);
+        }}
       >
         {isOpen ? "Close" : "Menu"}
       </button>

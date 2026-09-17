@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
 import { TranscriptExtraction } from "@/components/visuals/TranscriptExtraction";
 import { FLAGSHIP_PRODUCTS } from "@/lib/product-status";
@@ -10,6 +11,7 @@ import { PhoenixSystemMap } from "@/components/visuals/PhoenixSystemMap";
 import { WildfireContourMap } from "@/components/visuals/WildfireContourMap";
 
 export const metadata: Metadata = {
+  alternates: canonicalFor("/"),
   title: "Phoenix Fire Labs | Real-Time Wildfire Intelligence",
   description:
     "Phoenix Fire Labs builds operational intelligence systems for wildfire response: Mockingbird radio intelligence, Osprey operational picture, and Raven, the model they share.",

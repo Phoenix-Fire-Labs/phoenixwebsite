@@ -36,7 +36,7 @@ describe("rateLimited", () => {
   it("prunes aged-out keys instead of growing forever", () => {
     const now = Date.now();
 
-    for (let i = 0; i < 500; i++) rateLimited("login", `src-${i}`, LIMIT, now);
+    for (let i = 0; i < 500; i++) rateLimited("login", `src-${String(i)}`, LIMIT, now);
 
     // A later call in a fresh window must not retain the old keys.
     expect(rateLimited("login", "fresh", LIMIT, now + 120_000)).toBe(false);

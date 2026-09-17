@@ -3,7 +3,7 @@ import { z } from "zod";
 const MAX_LENGTHS = { name: 120, agency: 160, email: 254, role: 120, message: 4000 } as const;
 
 /** Server-side briefing qualification: named domain object, no unknown inputs. */
-export const BriefingSchema = z.object({
+const BriefingSchema = z.object({
   name: z.string().trim().min(2).max(MAX_LENGTHS.name),
   agency: z.string().trim().min(2).max(MAX_LENGTHS.agency),
   email: z.email().trim().max(MAX_LENGTHS.email),

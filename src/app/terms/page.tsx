@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 
 export const metadata: Metadata = {
+  alternates: canonicalFor("/terms"),
   title: "Terms",
   description: "Phoenix Fire Labs marketing site terms.",
 };

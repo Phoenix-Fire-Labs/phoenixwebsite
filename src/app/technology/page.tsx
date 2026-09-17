@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
 import { CardGrid } from "@/components/marketing/CardGrid";
 import { RESEARCH_PRODUCTS } from "@/lib/product-status";
@@ -10,6 +11,7 @@ import { RavenGraph } from "@/components/visuals/RavenGraph";
  *  a /roadmap route: a dedicated roadmap page turns direction into commitments
  *  and dates the company would have to defend. */
 export const metadata: Metadata = {
+  alternates: canonicalFor("/technology"),
   title: "Raven Operational World Model",
   description:
     "Raven is the shared operational intelligence layer beneath Phoenix: one model of the fireground that Mockingbird, Osprey, and future systems all refer to.",

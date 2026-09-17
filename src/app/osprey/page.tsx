@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
 import { OspreyOperationalMap } from "@/components/visuals/OspreyOperationalMap";
 import { WildfireContourMap } from "@/components/visuals/WildfireContourMap";
@@ -6,6 +7,7 @@ import { WildfireContourMap } from "@/components/visuals/WildfireContourMap";
 /** "Osprey" alone reads as a bird or an aircraft; the title carries the
  *  category so search and agents can disambiguate (spec §41). */
 export const metadata: Metadata = {
+  alternates: canonicalFor("/osprey"),
   title: "Osprey Wildfire Operational Intelligence",
   description:
     "Osprey assembles GIS, satellite imagery, fire perimeters, evacuations, infrastructure, and field data into one live operational picture.",

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
 import { SOLUTIONS } from "@/content/solutions";
 
 export const metadata: Metadata = {
+  alternates: canonicalFor("/solutions"),
   title: "Solutions",
   description:
     "Phoenix solutions for incident command, operations planning, and utility wildfire programs.",

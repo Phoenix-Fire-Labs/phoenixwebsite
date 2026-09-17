@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
 import { CardGrid } from "@/components/marketing/CardGrid";
 
 export const metadata: Metadata = {
+  alternates: canonicalFor("/careers"),
   title: "Careers",
   description: "Join Phoenix Fire Labs to build operational intelligence for wildfire response.",
 };

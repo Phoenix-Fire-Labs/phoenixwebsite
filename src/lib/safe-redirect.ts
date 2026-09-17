@@ -1,11 +1,18 @@
-/** Single tested open-redirect guard for the preview gate. Same-origin
- *  path only; everything else falls back to "/". */
+/** Single tested open-redirect guard for the preview gate.
+ *
+ *  Returns a same-origin *relative* path, or "/" for anything it cannot
+ *  vouch for. `parseBase` is only a base for resolving the relative
+ *  reference; it is not an allowlist, and the returned value never contains
+ *  an origin. Callers should emit the result as a relative Location. */
 
 // eslint-disable-next-line anti-slop/no-unknown-parameters -- FormDataEntryValue arrives
 // unparsed from the request boundary; the string check below IS the decoder.
 
 // trace:v1 id=impl.safe-redirect work=WORK-PHO-MB4M5AH6 satisfies=REQ-PHO-EM6MDMQA
-export function safeRedirect(value: FormDataEntryValue | string | null | undefined, baseUrl: string): string {
+export function safeRedirect(
+  value: FormDataEntryValue | string | null | undefined,
+  parseBase: string,
+): string {
   // eslint-disable-next-line anti-slop/no-runtime-typeof -- this IS the I/O boundary decoder.
   if (typeof value !== "string" || value === "") return "/";
 
@@ -22,12 +29,10 @@ export function safeRedirect(value: FormDataEntryValue | string | null | undefin
   let url: URL;
 
   try {
-    url = new URL(trimmed, baseUrl);
+    url = new URL(trimmed, parseBase);
   } catch {
     return "/";
   }
-
-  if (url.origin !== new URL(baseUrl).origin) return "/";
 
   const dest = url.pathname + url.search + url.hash;
 

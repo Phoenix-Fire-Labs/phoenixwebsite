@@ -8,6 +8,10 @@ import { clearFailures, clientKey, overBudget, recordFailure } from "@/lib/rate-
 import { safeRedirect } from "@/lib/safe-redirect";
 import { isSameOrigin } from "@/lib/same-origin";
 
+/** Base for resolving the relative redirect reference. Any absolute origin
+ *  works: safeRedirect returns a path, never an origin. */
+const SITE_ORIGIN_FOR_PARSE = "https://www.phoenixfirelabs.com";
+
 const LOGIN_LIMIT = { windowMs: 60_000, max: 10 };
 
 // trace:v1 id=impl.preview-login-route work=WORK-PHO-MB4M5AH6 satisfies=REQ-PHO-EM6MDMQA
@@ -51,7 +55,7 @@ export async function POST(request: Request) {
   const passwordField = form.get("password");
   // eslint-disable-next-line anti-slop/no-runtime-typeof -- this IS the I/O boundary decoder.
   const submitted = typeof passwordField === "string" ? passwordField : "";
-  const redirectTo = safeRedirect(form.get("redirect"), "https://www.phoenixfirelabs.com");
+  const redirectTo = safeRedirect(form.get("redirect"), SITE_ORIGIN_FOR_PARSE);
 
   // Relative Location for the same reason as the briefing route: Next
   // normalizes request.url's hostname, so an absolute redirect built from it

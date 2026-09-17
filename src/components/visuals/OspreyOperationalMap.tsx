@@ -25,7 +25,7 @@ export function OspreyOperationalMap() {
       aria-label="Six operational data feeds — GIS, satellite, fire perimeter, evacuation, infrastructure and field data — converging into one Osprey incident map"
     >
       {layers.map((layer, i) => (
-        <g key={layer.label} className={`osprey-layer osprey-layer-${i + 1}`}>
+        <g key={layer.label} className={`osprey-layer osprey-layer-${String(i + 1)}`}>
           <text
             x="0"
             y={layer.y + 3}
@@ -39,7 +39,7 @@ export function OspreyOperationalMap() {
           </text>
           <path
             className="osprey-rail"
-            d={`M 96 ${layer.y} L 178 ${layer.y} Q 208 ${layer.y} 208 170`}
+            d={`M 96 ${String(layer.y)} L 178 ${String(layer.y)} Q 208 ${String(layer.y)} 208 170`}
             stroke="var(--color-rule)"
             strokeWidth="1"
             pathLength={1}

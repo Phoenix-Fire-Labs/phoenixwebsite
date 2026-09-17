@@ -24,7 +24,7 @@ export function FoundersTimeline() {
       <path className="tl-rule" d="M 40 150 L 360 150" stroke="var(--color-rule)" strokeWidth="1" pathLength={1} />
 
       {marks.map((mark) => (
-        <g key={mark.what} transform={`translate(${mark.x}, 150)`} className={`tl-mark tl-mark-${mark.step}`}>
+        <g key={mark.what} transform={`translate(${String(mark.x)}, 150)`} className={`tl-mark tl-mark-${String(mark.step)}`}>
           <line className="tl-tick" x1="0" y1="-20" x2="0" y2="20" stroke="var(--color-rule)" strokeWidth="1" pathLength={1} />
           {mark.spark ? <circle className="tl-halo" cx="0" cy="0" r="16" fill="var(--color-accent-faint)" /> : null}
           <circle

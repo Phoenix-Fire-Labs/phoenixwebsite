@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import { ProductPage } from "@/components/products/ProductPage";
 import { productBySlug } from "@/lib/product-status";
 
 const product = productBySlug("peregrine")!;
 
 export const metadata: Metadata = {
+  alternates: canonicalFor("/peregrine"),
   title: "Peregrine Deployable Wildfire Sensing",
   description: product.blurb,
 };

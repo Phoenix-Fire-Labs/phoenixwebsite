@@ -47,6 +47,10 @@ export const config = {
     // expose — while gated, robots disallows everything and the sitemap is
     // empty. noindex still rides on the X-Robots-Tag header for every route
     // (spec §44: do not rely on robots.txt alone).
-    "/((?!api/preview/login|login|robots\\.txt|sitemap\\.xml|opengraph-image|favicon\\.ico|apple-touch-icon\\.png|.*\\.(?:png|jpg|jpeg|svg|gif|webp|ico|css|js|map|woff2?)$).*)",
+    //
+    // opengraph-image is deliberately NOT exempt: the generated card carries
+    // the headline and the Mockingbird/Osprey/Raven names, so exempting it
+    // published the positioning the preview gate exists to withhold.
+    "/((?!api/preview/login|login|robots\\.txt|sitemap\\.xml|favicon\\.ico|apple-touch-icon\\.png|.*\\.(?:png|jpg|jpeg|svg|gif|webp|ico|css|js|map|woff2?)$).*)",
   ],
 };

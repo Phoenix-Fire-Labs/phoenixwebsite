@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import { ProductPage } from "@/components/products/ProductPage";
 import { RavenGraph } from "@/components/visuals/RavenGraph";
 import { productBySlug } from "@/lib/product-status";
@@ -8,6 +9,7 @@ const product = productBySlug("raven")!;
 /** "Raven" alone is a bird; the title carries the category so search and
  *  agents can disambiguate it (spec §41). */
 export const metadata: Metadata = {
+  alternates: canonicalFor("/raven"),
   title: "Raven Operational World Model",
   description: product.blurb,
 };

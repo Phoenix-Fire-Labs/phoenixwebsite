@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
 import { TranscriptExtraction } from "@/components/visuals/TranscriptExtraction";
 import { MockingbirdRadioFlow } from "@/components/visuals/MockingbirdRadioFlow";
@@ -6,6 +7,7 @@ import { MockingbirdRadioFlow } from "@/components/visuals/MockingbirdRadioFlow"
 /** Title carries the category because "Mockingbird" alone is a bird, an
  *  unrelated bank, and a novel (spec §41). The H1 stays clean. */
 export const metadata: Metadata = {
+  alternates: canonicalFor("/mockingbird"),
   title: "Mockingbird Wildfire Radio Intelligence",
   description:
     "Mockingbird turns tactical VHF radio traffic into structured incident intelligence: locations, units, and events synchronized to command views.",
