@@ -173,6 +173,14 @@ The failing e2e run was the signal that the security control was wrong, not that
 
 `src/lib/rate-limit.ts` and any future auth endpoint. Note the limiter is per-isolate memory — a tripwire, not a control; the durable rule is a platform WAF policy that is still not checked in.
 
+Two further defects reviewers found in the same limiter, both worth checking in any implementation:
+
+**The bucket grew while refusing.** Every request reached `recent.push(now)`, including requests already over budget, so a caller being actively refused could grow its own array without bound and make each later prune more expensive. Under attack the limiter amplified the attack. Stop recording once the bucket is full.
+
+**Silent success is worse than an error.** The contact endpoint answered a throttled submission with `ok: true` and discarded it, on the theory that telling a bot it was throttled leaked information. For a human on a shared agency NAT that meant being told "Received" while the briefing went nowhere — the worst outcome for exactly the audience the form exists to serve. A bot can infer throttling anyway. Return 429 with a message and a direct-contact fallback.
+
+Generalizing: never report success for work you dropped. If a request cannot be honoured, the caller has to be able to tell.
+
 ## Clearing trace hook obligations and binding test evidence
 
 <!-- trace:v1 id=CONV-PHO-TP1RBRP1 type=convention state=ACTIVE work=WORK-PHO-18KENMFK -->
@@ -342,3 +350,116 @@ Expose each family with `variable: "--font-x"` and map it in CSS (`--font-displa
 ### Applies to
 
 `src/app/layout.tsx`, `src/app/globals.css` font tokens, and the CSP in `next.config.ts` — when font delivery changes, re-check the CSP.
+
+## Shared chrome in the root layout leaks the private site to the gate page
+
+<!-- trace:v1 id=ANTI-PHO-ZJ1SB425 type=anti_pattern state=ACTIVE work=WORK-PHO-MB4M5AH6 applies_to=impl.app-shell -->
+
+<!-- trace:inherit ANTI-PHO-ZJ1SB425 reason="template section" -->
+### Pattern
+
+Put `SiteHeader`, `SiteFooter` and the site-wide `metadata` in `src/app/layout.tsx`, then add an authentication or preview-gate route at `src/app/login/`.
+
+<!-- trace:inherit ANTI-PHO-ZJ1SB425 reason="template section" -->
+### Why
+
+It looks like the obvious place: one layout, every page gets the chrome, and `metadata` inheritance means each route only overrides its `title`.
+
+<!-- trace:inherit ANTI-PHO-ZJ1SB425 reason="template section" -->
+### Consequence
+
+The gate inherits all of it. On this repository an unauthenticated visitor to `/login` — the one page a stranger can reach — received **64 mentions of the six product names**, because the header dropdown, the footer sitemap and the inherited `description` / `keywords` / `og:description` / `twitter:description` all enumerate the product family. The gate existed specifically to withhold that positioning.
+
+Overriding only `title` is not enough; `metadata` merges field by field, so the marketing `description` and social cards survive into the gated page unless each is overridden explicitly.
+
+A reviewer caught this. It was invisible locally because every manual check was made while authenticated.
+
+<!-- trace:inherit ANTI-PHO-ZJ1SB425 reason="template section" -->
+### Correct approach
+
+Move the marketing routes into a route group (`src/app/(site)/`) whose layout owns the chrome, and leave the gate outside it. The root layout keeps only the document shell — `html`, `body`, fonts, the pre-paint script. The gate then supplies its own minimal header and footer and overrides `description`, `keywords`, `openGraph` and `twitter`.
+
+Verify by scraping the gate unauthenticated rather than by reading the code:
+
+```
+curl -s http://host/login | grep -oE "Product1|Product2|..." | sort | uniq -c
+```
+
+Expect no output. An e2e test asserts this over the whole product registry, so a new product cannot reintroduce the leak.
+
+<!-- trace:inherit ANTI-PHO-ZJ1SB425 reason="template section" -->
+### Applies to
+
+Any Next.js App Router site with a login, paywall or preview gate and shared chrome. The same reasoning covers generated social images: a dynamic `opengraph-image` route renders the headline and product names, so exempting it from the gate publishes the same content.
+
+## oxlint exits 0 when its config cannot be parsed
+
+<!-- trace:v1 id=FIND-PHO-HYW0H29T type=finding state=ACTIVE work=WORK-PHO-MB4M5AH6 -->
+
+<!-- trace:inherit FIND-PHO-HYW0H29T reason="template section" -->
+### Context
+
+A stray key was added to `.oxlintrc.json`. The next `yarn lint` reported zero errors, and a previously-reported error had disappeared.
+
+<!-- trace:inherit FIND-PHO-HYW0H29T reason="template section" -->
+### Finding
+
+`oxlint` writes `Failed to parse oxlint configuration file` and then **exits 0, having linted nothing**. The lint gate becomes a silent no-op that CI reports as green.
+
+This is worse than a normal failure because the signal inverts: a broken config looks exactly like a clean codebase. It was caught only because a real error vanished after a change that touched no TypeScript.
+
+Related trap in the same file: `.oxlintrc.json` accepts JSONC comments, but an unknown top-level key is rejected outright. Record rationale as a comment, never as a `$note`-style key.
+
+<!-- trace:inherit FIND-PHO-HYW0H29T reason="template section" -->
+### Evidence
+
+```
+$ yarn lint            # with a bogus key
+Failed to parse oxlint configuration file.
+  x unknown field `$note_...`, expected one of `$schema`, `plugins`, ...
+$ echo $?
+0
+```
+
+<!-- trace:inherit FIND-PHO-HYW0H29T reason="template section" -->
+### Consequence
+
+Any check whose tool can fail silently needs its own assertion. `scripts/lint.mjs` now runs oxlint, forwards the output, and exits 1 if the parse-failure string appears. Verified against three cases: valid config passes, broken config fails, and a real lint error is still reported.
+
+<!-- trace:inherit FIND-PHO-HYW0H29T reason="template section" -->
+### Applies to
+
+`yarn lint`. More generally: when wiring a quality gate, test that it **fails** when it should, not only that it passes. A gate never observed failing is not known to work.
+
+## storageState is not a Chromium profile, so Lighthouse audited the login page
+
+<!-- trace:v1 id=FIND-PHO-KWDMDNBT type=finding state=ACTIVE work=WORK-PHO-MB4M5AH6 -->
+
+<!-- trace:inherit FIND-PHO-KWDMDNBT reason="template section" -->
+### Context
+
+`scripts/lighthouse.mjs` seeded a preview session with Playwright, then handed the directory to chrome-launcher as a `userDataDir` and ran Lighthouse against the homepage.
+
+<!-- trace:inherit FIND-PHO-KWDMDNBT reason="template section" -->
+### Finding
+
+`context.storageState({ path: dir + "/state.json" })` writes **Playwright own cookie/origin JSON**. It does not turn the containing directory into a Chromium user-data profile. chrome-launcher therefore started a clean, unauthenticated browser, the gate redirected it to `/login`, and Lighthouse scored the login page while reporting the homepage URL.
+
+Nothing failed. The scores looked plausible, which is why it survived review until a reviewer read the mechanism rather than the output.
+
+A wrong password behaved the same way: the seeding step failed, the script continued, and the audit ran anyway.
+
+<!-- trace:inherit FIND-PHO-KWDMDNBT reason="template section" -->
+### Evidence
+
+After switching to `chromium.launchPersistentContext(dir)` — which does write a real profile — and asserting the homepage rendered before auditing, the scores changed to 0.97 performance / 0.96 accessibility / 1.0 best-practices. A deliberately wrong password now exits with `preview login failed: ... did not render the homepage`.
+
+<!-- trace:inherit FIND-PHO-KWDMDNBT reason="template section" -->
+### Consequence
+
+Any audit run behind an auth gate has to prove it is authenticated before measuring. Assert on page content, not on the absence of an error.
+
+<!-- trace:inherit FIND-PHO-KWDMDNBT reason="template section" -->
+### Applies to
+
+`scripts/lighthouse.mjs`, and any tool handed a "profile" directory produced by something other than the browser itself.

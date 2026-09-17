@@ -2,7 +2,7 @@
 title = "Enforce first-marker traceability"
 [work."WORK-PHO-MB4M5AH6"]
 title = "Phoenix multi-product migration"
-status = "active"
+status = "done"
 origin.source = "new_feature"
 origin.intent = "Migrate static site to Next.js and present Phoenix as a multi-product system with hardened preview gate."
 origin.session = "default"
