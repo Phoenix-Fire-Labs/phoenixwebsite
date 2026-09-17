@@ -20,7 +20,7 @@ origin.intent = "Readers cannot tell what Phoenix actually sells: the homepage s
 origin.session = "default"
 [work."WORK-PHO-JG8WSYBA"]
 title = "Run the BugHunt defense suite in CI"
-status = "active"
+status = "done"
 origin.source = "non_behavioral_edit"
-origin.intent = "BugHunt only ever ran on a developer machine, so its 61 analysis defenses never gated a pull request and a broken analyzer would go unnoticed. Run it in CI, publish its reports, and fail the build when a defense cannot execute."
+origin.intent = "BugHunt only ever ran on a developer machine, so the analyzers it wraps never gated a pull request. Run those analyzers in CI on their own terms -- not BugHunt itself, which exits 0 by design -- and report every finding as an inline review comment. Originally scoped as adding bughunt as a CI job; redirected during the work, see ADR-PHO-EB0ZJGD5."
 origin.session = "default"
