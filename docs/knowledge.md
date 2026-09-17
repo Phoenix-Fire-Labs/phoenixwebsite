@@ -229,6 +229,12 @@ Related: hand-authored section headings in this file must each be preceded by
 
 Order that worked: add honest `verifies=` edges -> `trace review <node>` for each stale test node -> run the suites with JUnit reporters -> generate normalized evidence -> ingest -> gitignore the artifacts.
 
+Two further details, learned by hitting them a second time:
+
+**Evidence is bound to a revision, so ingest last.** `trace evidence ingest --revision <sha>` binds to that exact commit. Finalizing, then making one more commit, re-opens TL021 immediately -- the receipts no longer match HEAD and `trace task finish` blocks again with no new test failure. Do the ingest-and-finish sequence after the final commit of a change set, not in the middle of one.
+
+**Stale nodes come from touching the file, not the node.** Appending a new entry to the end of this file staled three unrelated nodes near the top (`ANTI-`, `CONSTRAINT-`, `LEARN-`), because staleness is computed per file rather than per node. `trace review <id>` moves each STALE_REVIEW_REQUIRED node to REVIEWED_NEEDS_VERIFICATION and is a claim that the content is still correct, so read the node before reviewing it -- the whole point is defeated by acknowledging blind.
+
 <!-- trace:inherit CONV-PHO-TP1RBRP1 reason="template section" -->
 ### Applies to
 
@@ -541,3 +547,56 @@ Type-aware linting runs through `yarn lint` (`oxlint --type-aware`). AGENTS.md r
 ### Applies to
 
 Any tool that reaches into the TypeScript compiler API on this repository. More generally: a green local run proves nothing when `node_modules` has drifted from the lockfile. Before trusting a newly wired gate, reinstall from the lockfile and run it again -- that is what CI does.
+
+
+## Vercel without Corepack runs Yarn 1, which silently discards --immutable
+
+<!-- trace:v1 id=FIND-PHO-YRN1IMTB type=finding state=ACTIVE work=WORK-PHO-JG8WSYBA -->
+
+<!-- trace:inherit FIND-PHO-YRN1IMTB reason="template section" -->
+### Context
+
+A production build log showed a 241-second install and a wall of peer-dependency warnings. `package.json` pins `"packageManager": "yarn@4.18.0"` and `vercel.json` ran `yarn install --immutable`, so both looked correct.
+
+<!-- trace:inherit FIND-PHO-YRN1IMTB reason="template section" -->
+### Finding
+
+Vercel honours `packageManager` only when Corepack is enabled. Without it the builder runs its bundled **yarn 1.22.19**, which cannot read a Yarn 4 lockfile (`__metadata: version: 10`). It ignored `yarn.lock` entirely, re-resolved the whole tree from the registry, and wrote its own lockfile -- which is what the slow install and the warnings actually were.
+
+The serious part is not the speed. **`--immutable` is not a Yarn 1 flag, and Yarn 1 ignores unknown flags without complaint.** So the deployed dependency tree was whatever the registry resolved at build time, not what the lockfile pinned, while the configuration read as though integrity were enforced. Nothing in the log says the flag was dropped.
+
+`corepack yarn install --immutable` fixes it without depending on the `ENABLE_EXPERIMENTAL_COREPACK` project variable and without `corepack enable` mutating global shims. `COREPACK_ENABLE_DOWNLOAD_PROMPT=0` stops Corepack prompting before it fetches the pinned version on a non-TTY builder. `buildCommand` needs the same treatment or the build step falls back to Yarn 1 after a Yarn 4 install.
+
+<!-- trace:inherit FIND-PHO-YRN1IMTB reason="template section" -->
+### Evidence
+
+Before:
+
+```
+Running "install" command: `yarn install --immutable`...
+yarn install v1.22.19
+warning package.json: No license field
+[3/4] Linking dependencies...
+success Saved lockfile.          <- rewrote the lockfile it could not read
+Done in 241.54s.
+```
+
+After:
+
+```
+Running "install" command: `COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack yarn install --immutable`...
+YN0000: · Yarn 4.18.0
+YN0000: · Done with warnings in 11s 772ms
+```
+
+241.5s -> 11.8s, and the yarn-1 warning classes ("No license field", "Workspaces can only be enabled in private projects", the peer spam) disappear because they were artifacts of yarn 1 re-resolving.
+
+<!-- trace:inherit FIND-PHO-YRN1IMTB reason="template section" -->
+### Consequence
+
+Check `yarn install --immutable` passes locally before enforcing it on a builder, so switching to a real immutable install cannot fail the deploy on pre-existing lockfile drift.
+
+<!-- trace:inherit FIND-PHO-YRN1IMTB reason="template section" -->
+### Applies to
+
+`vercel.json`. Generally: confirm which package manager a hosted builder actually ran by reading its version line in the log, rather than inferring it from `packageManager`. A flag that the wrong tool silently drops is worse than one that errors -- the log looks like the guarantee is in force.
