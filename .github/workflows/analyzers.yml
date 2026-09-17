@@ -101,19 +101,17 @@ jobs:
 
       # Workflow syntax and action inputs. This caught a broken re-indent of
       # njsscan.yml that yamllint alone reported as clean.
+      #
+      # This also covers shellcheck: actionlint runs shellcheck over every
+      # `run:` block, which is the only shell this repository has. A standalone
+      # shellcheck step was removed -- the repo contains no .sh files of its
+      # own, so it only ever reported findings in node_modules and vendored
+      # tooling. Re-add it with node_modules excluded if real scripts appear.
       - uses: reviewdog/action-actionlint@v1
         with:
           reporter: ${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }}
           filter_mode: nofilter
           fail_level: any
-
-      - uses: reviewdog/action-shellcheck@v1
-        with:
-          reporter: ${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }}
-          filter_mode: nofilter
-          fail_level: any
-          path: "."
-          pattern: "*.sh"
 
       # line-length, truthy and document-start are disabled: GitHub workflow
       # YAML conventionally omits `---`, `on:` is legitimately truthy, and an

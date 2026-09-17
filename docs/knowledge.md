@@ -463,3 +463,81 @@ Any audit run behind an auth gate has to prove it is authenticated before measur
 ### Applies to
 
 `scripts/lighthouse.mjs`, and any tool handed a "profile" directory produced by something other than the browser itself.
+
+## Redirecting an analyzer's report into the checkout can destroy its own config
+
+<!-- trace:v1 id=FIND-PHO-RPTCLOB1 type=finding state=ACTIVE work=WORK-PHO-JG8WSYBA -->
+
+<!-- trace:inherit FIND-PHO-RPTCLOB1 reason="template section" -->
+### Context
+
+Wiring knip into CI. The natural-looking form is `yarn knip --reporter json > knip.json`, because the tool is knip and the report is JSON.
+
+<!-- trace:inherit FIND-PHO-RPTCLOB1 reason="template section" -->
+### Finding
+
+`knip.json` is knip's **configuration** file. The redirect truncated it before knip started, so knip read a zero-byte file and failed with `Error parsing /.../knip.json`. The report destroyed the config that produced it.
+
+The shell opens the redirect target before the command runs, so this is not a race and cannot be fixed by ordering. The general shape: a tool named X, configured by `X.json`, asked to write its report to `X.json`.
+
+This cannot reproduce when the report is consumed from a pipe, which is how it was exercised locally, so the tree stayed clean and the bug only appeared in CI.
+
+<!-- trace:inherit FIND-PHO-RPTCLOB1 reason="template section" -->
+### Evidence
+
+```
+ERROR: Error loading /home/runner/work/phoenixwebsite/phoenixwebsite/knip.json
+Reason: Error parsing /home/runner/work/phoenixwebsite/phoenixwebsite/knip.json
+```
+
+<!-- trace:inherit FIND-PHO-RPTCLOB1 reason="template section" -->
+### Consequence
+
+Every analyzer in `.github/workflows/analyzers.yml` writes its report to `"$RUNNER_TEMP"`, never into the checkout. A report is build output; the checkout is input.
+
+Corollary found in the same run: when a report file is missing, `cmd < missing.json` fails at the redirect and reviewdog receives empty input, reporting a confusing `proto: syntax error` rather than the real cause.
+
+<!-- trace:inherit FIND-PHO-RPTCLOB1 reason="template section" -->
+### Applies to
+
+Any CI step redirecting tool output to a path inside the repository. Write reports outside the checkout, and prefer a pipe when the consumer can take one.
+
+## typescript-eslint cannot run against TypeScript 7
+
+<!-- trace:v1 id=FIND-PHO-TSE7BLCK type=finding state=ACTIVE work=WORK-PHO-JG8WSYBA -->
+
+<!-- trace:inherit FIND-PHO-TSE7BLCK reason="template section" -->
+### Context
+
+Adding the type-aware lint rules oxlint could not express, via an `eslint.config.mjs` using `typescript-eslint`. It worked locally for an entire session: it linted, and it reported real `@typescript-eslint/require-await` findings.
+
+<!-- trace:inherit FIND-PHO-TSE7BLCK reason="template section" -->
+### Finding
+
+`typescript-eslint` reads `ts.versionMajorMinor` at import time and **throws outright** when the major version is 7 or above. This project is pinned to TypeScript 7.0.2, so a clean install can never run it. Upstream tracking is typescript-eslint#10940.
+
+It appeared to work because `node_modules` was stale. The first `yarn install --immutable` after a branch change repaired the tree to what the lockfile actually pins, and every ESLint invocation began throwing. CI installs from the lockfile every time, so CI would have failed on arrival.
+
+oxlint's `--type-aware` mode (the `oxlint-tsgolint` package) covers the same rule family and is built on the typescript-go engine TypeScript 7 itself uses, so it has no such conflict. It found two genuine defects immediately: an `await` on chrome-launcher's `kill()`, which returns `void`, and an `async` function with no `await`.
+
+<!-- trace:inherit FIND-PHO-TSE7BLCK reason="template section" -->
+### Evidence
+
+```
+$ npx eslint .
+typescript-eslint does not support TS 7.0.
+Error: typescript-eslint does not support TS 7.0.
+    at Object.<anonymous> (node_modules/typescript-eslint/dist/index.js:52:11)
+$ node -e "console.log(require.resolve('typescript',{paths:['./node_modules/typescript-eslint']}))"
+/Users/rocket/phoenixwebsite/node_modules/typescript/package.json 7.0.2
+```
+
+<!-- trace:inherit FIND-PHO-TSE7BLCK reason="template section" -->
+### Consequence
+
+Type-aware linting runs through `yarn lint` (`oxlint --type-aware`). AGENTS.md records this so the eslint route is not attempted again.
+
+<!-- trace:inherit FIND-PHO-TSE7BLCK reason="template section" -->
+### Applies to
+
+Any tool that reaches into the TypeScript compiler API on this repository. More generally: a green local run proves nothing when `node_modules` has drifted from the lockfile. Before trusting a newly wired gate, reinstall from the lockfile and run it again -- that is what CI does.
