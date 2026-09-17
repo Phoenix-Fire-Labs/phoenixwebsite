@@ -1,0 +1,29 @@
+{
+  "markers": [
+    {
+      "key": "dependencies",
+      "line": 14,
+      "marker": "# trace:v1 id=ops.package.dependencies work=WORK-PHO-MB4M5AH6 satisfies=REQ-PHO-XH2DZ7EX"
+    },
+    {
+      "key": "devDependencies",
+      "line": 23,
+      "marker": "# trace:v1 id=ops.package.devdependencies work=WORK-PHO-MB4M5AH6 satisfies=REQ-PHO-XH2DZ7EX"
+    },
+    {
+      "key": "name",
+      "line": 2,
+      "marker": "# trace:v1 id=ops.package.name work=WORK-PHO-MB4M5AH6 satisfies=REQ-PHO-XH2DZ7EX"
+    },
+    {
+      "key": "packageManager",
+      "line": 3,
+      "marker": "# trace:v1 id=ops.package.packagemanager work=WORK-PHO-MB4M5AH6 satisfies=REQ-PHO-XH2DZ7EX"
+    },
+    {
+      "key": "scripts",
+      "line": 4,
+      "marker": "# trace:v1 id=ops.package.scripts work=WORK-PHO-MB4M5AH6 satisfies=REQ-PHO-XH2DZ7EX"
+    }
+  ]
+}

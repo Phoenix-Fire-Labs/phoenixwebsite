@@ -1,0 +1,2668 @@
+@import "tailwindcss";
+
+@theme {
+  /* trace:exempt reason=design-tokens */
+  --color-bg: #f6f3ed;
+  --color-bg-alt: #edeae2;
+  --color-text: #1a1815;
+  --color-text-mid: #3d3833;
+  --color-text-secondary: #5c5651;
+  --color-text-tertiary: #9c968f;
+  --color-accent: #a0440d;
+  --color-accent-warm: #c67b2e;
+  --color-accent-faint: rgba(160, 68, 13, 0.12);
+  --color-rule: #dad6cd;
+  /* Supplied by next/font in layout.tsx; the literal names remain as the
+     fallback for any context where the variables are not set. */
+  --font-display: var(--font-fraunces), "Fraunces", "Georgia", serif;
+  --font-body: var(--font-figtree), "Figtree", system-ui, sans-serif;
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Type scale. Every heading on the site resolves to one of these — an h1
+     must render at the same size whether the page uses a split hero or a
+     stacked one. Before this existed, h1 measured 60px, 48px and 36px on
+     different routes. */
+  --text-display: clamp(2.25rem, 4.5vw, 3.75rem);
+  --text-h2: clamp(1.5rem, 3vw, 2.25rem);
+  --text-h3: clamp(1.125rem, 1.9vw, 1.375rem);
+  --text-lede: clamp(1.0625rem, 1.7vw, 1.25rem);
+  --text-body: clamp(0.9375rem, 1.3vw, 1rem);
+  --text-small: 0.8125rem;
+  --text-label: 0.6875rem;
+
+  /* Spacing scale. Section rhythm and gutters come from here so a new page
+     cannot introduce its own padding. */
+  --space-section-y: clamp(3.5rem, 8vw, 6rem);
+  --space-gutter: clamp(1.5rem, 5vw, 4rem);
+  --space-block: clamp(1.75rem, 3.5vw, 2.5rem);
+  --space-tight: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+/* trace:exempt reason=base-styles */
+/* No global `scroll-behavior: smooth`: Next scrolls to the top on every
+   client-side navigation, and smooth turns that into a long visible flight up
+   from wherever the previous page was scrolled. Smooth is re-enabled only for
+   in-page anchor jumps, where it was actually wanted. */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* trace:exempt reason=base-styles */
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  font-kerning: normal;
+  overflow-x: hidden;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 200;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-size: 0.8125rem;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.skip-link:focus {
+  left: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: clamp(0.625rem, 1.2vw, 0.875rem) clamp(1.5rem, 5vw, 4rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-decoration: none;
+  flex-shrink: 0;
+  gap: 1px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.logo-img {
+  height: 44px;
+  width: auto;
+  display: block;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.logo-sub {
+  font-family: var(--font-body);
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-left: -0.06em;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.header-link {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: color 200ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.header-link:hover {
+  color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: center;
+  padding: var(--space-block) var(--space-gutter);
+
+  /* Fill the space under the sticky header and centre within it, rather than
+     sitting flush to the header on shorter windows. `min-height` (not
+     `height`) so a tall hero still grows instead of clipping, and `dvh` so
+     mobile browser chrome does not cause a jump. 4.5rem is the header. */
+  min-height: min(44rem, calc(100dvh - 4.5rem));
+  align-content: center;
+}
+
+/* On a short window the hero's own content is taller than the viewport, so
+   tighten its rhythm rather than letting it push the CTAs below the fold. */
+/* trace:exempt reason=presentational-utilities */
+@media (max-height: 700px) {
+  .hero {
+    min-height: 0;
+    padding-block: var(--space-tight);
+  }
+
+  .hero-headline {
+    margin-bottom: var(--space-tight);
+  }
+
+  .hero-inception {
+    margin-top: var(--space-tight);
+  }
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-content {
+  min-width: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 550;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 1.75rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-headline,
+/* trace:exempt reason=presentational-utilities */
+.page-hero h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 750;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin-bottom: var(--space-block);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-sub {
+  font-size: var(--text-lede);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  max-width: 52ch;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-inception {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.inception-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--color-rule);
+  flex-shrink: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.inception-label {
+  font-size: 0.6875rem;
+  font-weight: 550;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-vis {
+  justify-self: center;
+  width: 100%;
+  max-width: 480px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-map {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+
+/* trace:exempt reason=presentational-utilities */
+.section-pad {
+  padding: var(--space-section-y) var(--space-gutter);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.section-label {
+  font-size: 0.6875rem;
+  font-weight: 550;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: 1rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.section-heading {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: 650;
+  line-height: 1.15;
+  margin-bottom: var(--space-tight);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.section-body {
+  font-size: var(--text-body);
+  line-height: 1.75;
+  color: var(--color-text-mid);
+  max-width: 62ch;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.split-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(3rem, 6vw, 6rem);
+  align-items: center;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.vis-container {
+  width: 100%;
+  max-width: 500px;
+  justify-self: center;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.problem {
+  border-top: 1px solid var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.problem-pull {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.35;
+  max-width: 34ch;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.problem-pull em {
+  font-style: normal;
+  color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.goal-line {
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: 500;
+  line-height: 1.4;
+  margin-top: clamp(2rem, 4vw, 3rem);
+  max-width: 50ch;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.goal-line strong {
+  color: var(--color-accent);
+  font-weight: 650;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.mockingbird {
+  background: var(--color-bg-alt);
+  border-top: 1px solid var(--color-rule);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.mb-name {
+  font-family: var(--font-body);
+  font-size: var(--text-h2);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  margin-bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.mb-desc {
+  font-size: var(--text-body);
+  line-height: 1.75;
+  color: var(--color-text-mid);
+  max-width: 60ch;
+  margin-bottom: clamp(3rem, 6vw, 4.5rem);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(1.25rem, 3vw, 2rem);
+  position: relative;
+  max-width: 56rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flow::before {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: linear-gradient(to right, var(--color-accent), var(--color-accent));
+  opacity: 0.2;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flow-step {
+  position: relative;
+  padding-top: 3.5rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flow-icon {
+  width: 40px;
+  height: 40px;
+  color: var(--color-accent);
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--color-bg-alt);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flow-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flow-step:hover .flow-icon {
+  animation: iconBounce 0.5s var(--ease-out-expo);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flow-title {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  margin-bottom: 0.375rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flow-desc {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.capabilities {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  padding: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.capabilities li {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.capabilities li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 8px;
+  height: 1.5px;
+  background: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.founders-text {
+  font-size: var(--text-body);
+  line-height: 1.75;
+  color: var(--color-text-mid);
+  max-width: 60ch;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.site-footer {
+  margin-top: clamp(1rem, 3vw, 2rem);
+  padding: clamp(2.5rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 4rem);
+  border-top: 1px solid var(--color-rule);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.footer-copy {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.footer-blurb {
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  max-width: 62ch;
+  margin: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.content-container {
+  min-width: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.footer-brand-block {
+  min-width: 140px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nvidia-badge,
+/* trace:exempt reason=presentational-utilities */
+.footer-nvidia-badge {
+  display: block;
+  width: 140px;
+  height: auto;
+  opacity: 0.85;
+  transition: opacity 200ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nvidia-badge:hover,
+/* trace:exempt reason=presentational-utilities */
+.footer-nvidia-badge:hover {
+  opacity: 1;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.footer-nvidia-badge {
+  margin-top: 1.25rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-headline .line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-headline .line > span {
+  display: block;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-headline .line > span {
+  opacity: 0;
+  transform: translateY(105%);
+  animation: revealLine 800ms var(--ease-out-expo) forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-headline .line:nth-child(1) > span {
+  animation-delay: 250ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-headline .line:nth-child(2) > span {
+  animation-delay: 420ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-eyebrow,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-sub,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-vis,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-inception {
+  opacity: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-eyebrow {
+  transform: translateY(8px);
+  animation: fadeUp 600ms var(--ease-out-quart) 100ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-vis {
+  animation: fadeUp 800ms var(--ease-out-quart) 200ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-sub {
+  transform: translateY(12px);
+  animation: fadeUp 700ms var(--ease-out-quart) 650ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-inception {
+  transform: translateY(8px);
+  animation: fadeUp 600ms var(--ease-out-quart) 850ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-map .contour {
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .c1 {
+  animation: drawPath 1.6s var(--ease-out-expo) 400ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .c2 {
+  animation: drawPath 1.4s var(--ease-out-expo) 600ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .c-fire-draw {
+  animation: drawPath 1.2s var(--ease-out-expo) 800ms forwards, fadeOut 250ms ease 2000ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .c-fire-dash {
+  fill: none;
+  stroke-dasharray: 0.025 0.013;
+  opacity: 0;
+  animation: fadeIn 300ms ease 2000ms forwards, fireDash 5s linear 2000ms infinite;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .c4 {
+  animation: drawPath 1s var(--ease-out-expo) 1000ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .map-grid,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .map-labels,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .map-coords,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .map-scale {
+  opacity: 0;
+  animation: fadeIn 600ms ease 2.2s forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .live-dot {
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-map .data-point {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .data-point {
+  opacity: 0;
+  animation: pointPop 500ms var(--ease-out-quart) forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .dp1 {
+  animation-delay: 1.8s;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .dp2 {
+  animation-delay: 1.95s;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .dp3 {
+  animation-delay: 2.1s;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.hero-map .point-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .point-ring {
+  animation: ringPulse 3s ease-out infinite;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .dp1 .point-ring {
+  animation-delay: 2.5s;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .dp2 .point-ring {
+  animation-delay: 2.8s;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .hero-map .dp3 .point-ring {
+  animation-delay: 3.1s;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 600ms var(--ease-out-quart), transform 600ms var(--ease-out-quart);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .reveal.visible,
+.js-anim svg.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.stagger > .reveal {
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.stagger > .reveal[data-i="0"] {
+  transition-delay: calc(0 * 70ms);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.stagger > .reveal[data-i="1"] {
+  transition-delay: calc(1 * 70ms);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.stagger > .reveal[data-i="2"] {
+  transition-delay: calc(2 * 70ms);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.stagger > .reveal[data-i="3"] {
+  transition-delay: calc(3 * 70ms);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.stagger > .reveal[data-i="4"] {
+  transition-delay: calc(4 * 70ms);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.stagger > .reveal[data-i="5"] {
+  transition-delay: calc(5 * 70ms);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.stagger > .reveal[data-i="6"] {
+  transition-delay: calc(6 * 70ms);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.section-line {
+  width: 48px;
+  height: 2px;
+  margin-bottom: 2.5rem;
+  display: block;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .section-line line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 700ms var(--ease-out-expo);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .section-line.visible line {
+  stroke-dashoffset: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.wave-anim {
+  animation: wavePulse 1.5s ease-in-out infinite alternate;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.wave-anim:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.wave-anim:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.scan-anim {
+  animation: scanMove 2s linear infinite;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.extract-anim {
+  animation: extractPop 2s var(--ease-out-expo) infinite;
+  transform-origin: center;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.extract-anim:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.extract-anim:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.sync-anim {
+  animation: syncSpin 4s linear infinite;
+  transform-origin: 20px 18px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-stage {
+  opacity: 1;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .story-stage + .story-stage {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 500ms var(--ease-out-quart), transform 500ms var(--ease-out-quart);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .story-stage.is-active {
+  opacity: 1;
+  transform: none;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-stages button {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--color-rule);
+  border-radius: 999px;
+  padding: 0.375rem 0.875rem;
+  cursor: pointer;
+  transition: color 150ms, border-color 150ms, background 150ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-stages button:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-stages button.is-active {
+  color: #fff;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-progress {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-progress li {
+  height: 2px;
+  width: 2.5rem;
+  background: var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-progress li.is-active {
+  background: var(--color-accent);
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes revealLine {
+  from { opacity: 0; transform: translateY(105%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes drawPath {
+  to { stroke-dashoffset: 0; }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes fireDash {
+  to { stroke-dashoffset: -0.076; }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes livePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes pointPop {
+  from { opacity: 0; transform: scale(0); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes ringPulse {
+  0% { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes wavePulse {
+  0% { opacity: 0.3; transform: scaleY(0.8); }
+  100% { opacity: 1; transform: scaleY(1.2); }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes scanMove {
+  0% { transform: translateY(-5px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(20px); opacity: 0; }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes extractPop {
+  0% { transform: scale(0); opacity: 0; }
+  20% { transform: scale(1.2); opacity: 1; }
+  30% { transform: scale(1); opacity: 1; }
+  80% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes syncSpin {
+  100% { transform: rotate(360deg); }
+}
+
+/* trace:exempt reason=presentational-utilities */
+.latency-line {
+  stroke-dasharray: 4 6;
+  animation: dashFlow 20s linear infinite;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.latency-fast {
+  stroke-dasharray: 4 6;
+  animation: dashFlow 2s linear infinite;
+}
+
+/* trace:exempt reason=keyframe-definitions */
+@keyframes dashFlow {
+  to { stroke-dashoffset: -100; }
+}
+
+/* trace:exempt reason=presentational-utilities */
+.pulse-node {
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.gate-label {
+  font-size: 0.6875rem;
+  font-weight: 550;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  margin-bottom: 0.625rem;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 700ms var(--ease-out-quart) 800ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.gate-form {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 26rem;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 700ms var(--ease-out-quart) 850ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.gate-form input[type="password"] {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  background: #fff;
+  border: 1px solid var(--color-rule);
+  border-radius: 3px;
+  padding: 0.75rem 0.9375rem;
+  outline: none;
+  transition: border-color 150ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.gate-form input[type="password"]:focus {
+  border-color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.gate-form button {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: var(--color-accent);
+  border: none;
+  border-radius: 3px;
+  padding: 0 1.5rem;
+  cursor: pointer;
+  transition: background 150ms;
+  flex-shrink: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.gate-form button:hover {
+  background: var(--color-accent-warm);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.contact-form {
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 32rem;
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.contact-form .gate-label {
+  animation: none;
+  opacity: 1;
+  transform: none;
+  margin-top: 1.25rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.contact-form input:not([type="hidden"]),
+.contact-form select,
+.contact-form textarea {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  background: #fff;
+  border: 1px solid var(--color-rule);
+  border-radius: 3px;
+  padding: 0.75rem 0.9375rem;
+  outline: none;
+  transition: border-color 150ms;
+  width: 100%;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.contact-form input:focus,
+.contact-form select:focus,
+.contact-form textarea:focus {
+  border-color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.contact-form button {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-accent);
+  border: none;
+  border-radius: 3px;
+  padding: 0.8125rem 1.5rem;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  align-self: flex-start;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.contact-form button:hover {
+  background: var(--color-accent-warm);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.gate-error {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  font-size: 0.8125rem;
+  color: var(--color-accent);
+  font-weight: 500;
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  max-width: 26rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.gate-error::before {
+  content: "";
+  width: 8px;
+  height: 1.5px;
+  background: var(--color-accent);
+  flex-shrink: 0;
+  transform: translateY(-2px);
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (prefers-reduced-motion: reduce) {
+  .js-anim .hero-headline .line > span,
+  .js-anim .hero-eyebrow,
+  .js-anim .hero-sub,
+  .js-anim .hero-vis,
+  .js-anim .hero-inception,
+  .js-anim .hero-map .contour,
+  .js-anim .hero-map .c-fire-draw,
+  .js-anim .hero-map .c-fire-dash,
+  .js-anim .hero-map .map-grid,
+  .js-anim .hero-map .map-labels,
+  .js-anim .hero-map .map-coords,
+  .js-anim .hero-map .map-scale,
+  .js-anim .hero-map .data-point,
+  .js-anim .hero-map .point-ring,
+  .js-anim .hero-map .live-dot,
+  .js-anim .reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .js-anim .hero-map .c-fire-draw {
+    opacity: 0;
+  }
+
+  .js-anim .hero-map .point-ring {
+    opacity: 0;
+  }
+
+  .js-anim .reveal {
+    transition: opacity 200ms;
+  }
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-vis {
+    max-width: 380px;
+    justify-self: start;
+  }
+
+  .split-section,
+  .split-section.reverse {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .split-section.reverse .vis-container {
+    order: -1;
+  }
+
+  .vis-container {
+    justify-self: start;
+    max-width: 400px;
+  }
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (max-width: 768px) {
+  .flow {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem 1.25rem;
+  }
+
+  .flow::before {
+    display: none;
+  }
+
+  .site-footer {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (max-width: 480px) {
+  .flow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Primary navigation (spec §3)
+   ───────────────────────────────────────────────────────────── */
+
+/* trace:exempt reason=presentational-utilities */
+.site-nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nav-groups {
+  list-style: none;
+  display: flex;
+  gap: clamp(1rem, 2.5vw, 2.25rem);
+  margin: 0;
+  padding: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nav-group {
+  position: relative;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nav-group-label {
+  display: inline-block;
+  padding: 0.75rem 0;
+  font-size: 0.8125rem;
+  font-weight: 550;
+  letter-spacing: 0.02em;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color 200ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nav-group-label:hover,
+/* trace:exempt reason=presentational-utilities */
+.nav-group:focus-within .nav-group-label {
+  color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nav-panel {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  translate: -50% 0;
+  min-width: 17rem;
+  padding: 1.125rem 1.25rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-rule);
+  border-radius: 4px;
+  box-shadow: 0 12px 32px rgb(26 24 21 / 8%);
+  display: grid;
+  gap: 1rem;
+  opacity: 0;
+  visibility: hidden;
+  translate: -50% 6px;
+  transition: opacity 160ms var(--ease-out-quart), translate 160ms var(--ease-out-quart), visibility 160ms;
+}
+
+/* Hover and keyboard focus both open the panel; no JavaScript involved. */
+/* trace:exempt reason=presentational-utilities */
+.nav-group:hover .nav-panel,
+/* trace:exempt reason=presentational-utilities */
+.nav-group:focus-within .nav-panel {
+  opacity: 1;
+  visibility: visible;
+  translate: -50% 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nav-panel-heading {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: 0.625rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nav-panel-section ul {
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nav-panel-section a {
+  display: block;
+  text-decoration: none;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nav-item-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  transition: color 200ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nav-panel-section a:hover .nav-item-label {
+  color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.nav-item-detail {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* ─── Buttons (spec §7: enterprise CTA, not "Learn More") ─── */
+
+/* trace:exempt reason=presentational-utilities */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 0.8125rem 1.375rem;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 150ms, color 150ms, border-color 150ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.btn-sm {
+  font-size: 0.8125rem;
+  padding: 0.625rem 1rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.btn-primary:hover {
+  background: var(--color-accent-warm);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.btn-secondary {
+  background: transparent;
+  color: var(--color-text);
+  border-color: var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.btn-secondary:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: clamp(1.75rem, 3vw, 2.25rem);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-accent-faint);
+  transition: border-color 150ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.text-link:hover {
+  border-bottom-color: var(--color-accent);
+}
+
+/* ─── Mobile navigation ─── */
+
+/* trace:exempt reason=presentational-utilities */
+.mobile-menu {
+  display: none;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.mobile-menu-toggle {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: transparent;
+  border: 1px solid var(--color-rule);
+  border-radius: 3px;
+  padding: 0.5rem 0.875rem;
+  cursor: pointer;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.mobile-nav {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 110;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-rule);
+  padding: 1.5rem clamp(1.5rem, 5vw, 4rem) 2rem;
+  display: grid;
+  gap: 1.5rem;
+  max-height: calc(100dvh - 4rem);
+  overflow-y: auto;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.mobile-nav-group {
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.mobile-nav-group a {
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.mobile-nav-heading {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.mobile-nav-legal {
+  grid-auto-flow: column;
+  justify-content: start;
+  gap: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.mobile-nav-legal a {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+/* ─── Footer sitemap ─── */
+
+/* trace:exempt reason=presentational-utilities */
+.footer-logo {
+  height: 32px;
+  width: auto;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.footer-nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.footer-nav-group ul {
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.footer-nav-group a {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color 200ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.footer-nav-group a:hover {
+  color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.footer-nav-heading {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: 0.75rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.footer-legal {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding-top: 1.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+a.footer-copy {
+  text-decoration: none;
+  transition: color 200ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+a.footer-copy:hover {
+  color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (max-width: 900px) {
+  .site-nav {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: block;
+  }
+
+  .site-header {
+    position: sticky;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Homepage: fragmented sources, flagship pair, stats, roadmap
+   ───────────────────────────────────────────────────────────── */
+
+/* trace:exempt reason=presentational-utilities */
+.source-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.75rem;
+  margin: clamp(2rem, 4vw, 3rem) 0;
+  padding: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.source-card {
+  display: grid;
+  gap: 0.25rem;
+  padding: 1.25rem 1.125rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-rule);
+  border-radius: 3px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.source-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.source-detail {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.problem-split {
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+/* ─── Flagship pair: the two cards must stay visually equal (spec §11) ─── */
+
+/* trace:exempt reason=presentational-utilities */
+.flagship {
+  background: var(--color-bg-alt);
+  border-top: 1px solid var(--color-rule);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flagship-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
+  align-items: stretch;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flagship-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  background: var(--color-bg);
+  border: 1px solid var(--color-rule);
+  border-radius: 4px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flagship-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flagship-name {
+  font-family: var(--font-body);
+  font-size: var(--text-h2);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flagship-lede {
+  font-family: var(--font-display);
+  font-size: var(--text-lede);
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--color-text);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flagship-body {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--color-text-mid);
+}
+
+/* The flow/diagram block absorbs the height difference so both cards end with
+   their link on the same line regardless of copy length. */
+/* trace:exempt reason=presentational-utilities */
+.flagship-card .flow,
+/* trace:exempt reason=presentational-utilities */
+.flagship-vis {
+  margin: auto 0;
+  padding: clamp(1.25rem, 2.5vw, 2rem) 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flagship-card .flow {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.75rem 1.25rem;
+  max-width: none;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flagship-card .flow::before {
+  display: none;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.flagship-card .flow-icon {
+  background: var(--color-bg);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.osprey-map {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ─── Statistics ─── */
+
+/* trace:exempt reason=presentational-utilities */
+.stat-row,
+/* trace:exempt reason=presentational-utilities */
+.palisades-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  margin: clamp(1.75rem, 3.5vw, 2.5rem) 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.stat-value {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.palisades-head .stat-value {
+  color: var(--color-text);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.stat-label {
+  display: block;
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.stat-source {
+  display: block;
+  margin-top: 0.375rem;
+  font-size: 0.6875rem;
+  color: var(--color-text-tertiary);
+}
+
+/* ─── Roadmap and research horizon (spec §16: deliberately asymmetric) ─── */
+
+/* trace:exempt reason=presentational-utilities */
+.status-pill {
+  display: inline-block;
+  padding: 0.3125rem 0.625rem;
+  margin-bottom: 0.875rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: var(--color-accent-faint);
+  border-radius: 2px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.status-pill-quiet {
+  color: var(--color-text-tertiary);
+  background: transparent;
+  border: 1px solid var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.roadmap-card {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.research-horizon {
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+  padding-top: clamp(2rem, 4vw, 3rem);
+  border-top: 1px solid var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.research-heading {
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.research-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+  max-width: 44rem;
+}
+
+/* Monochrome and small: these are concepts, not products on sale. */
+/* trace:exempt reason=presentational-utilities */
+.research-card {
+  padding: 1.25rem;
+  border: 1px solid var(--color-rule);
+  border-radius: 3px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.research-name {
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.375rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.research-body {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.raven-section {
+  background: var(--color-bg-alt);
+  border-top: 1px solid var(--color-rule);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.cta-section {
+  border-top: 1px solid var(--color-rule);
+}
+
+/* ─── Osprey layer diagram animation ─── */
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .osprey-rail {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawPath 1.4s var(--ease-out-expo) forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .osprey-layer-1 .osprey-rail { animation-delay: 200ms; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .osprey-layer-2 .osprey-rail { animation-delay: 320ms; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .osprey-layer-3 .osprey-rail { animation-delay: 440ms; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .osprey-layer-4 .osprey-rail { animation-delay: 560ms; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .osprey-layer-5 .osprey-rail { animation-delay: 680ms; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .osprey-layer-6 .osprey-rail { animation-delay: 800ms; }
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .osprey-contour,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .osprey-perimeter {
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawPath 1.6s var(--ease-out-expo) 900ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .osprey-unit {
+  opacity: 0;
+  animation: fadeIn 500ms ease 2s forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .osprey-node {
+  opacity: 0;
+  animation: fadeIn 400ms ease forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (max-width: 900px) {
+  .flagship-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (prefers-reduced-motion: reduce) {
+  .js-anim .osprey-rail,
+  .js-anim .osprey-contour,
+  .js-anim .osprey-perimeter,
+  .js-anim .osprey-unit,
+  .js-anim .osprey-node {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Founders timeline + Raven graph choreography
+   ───────────────────────────────────────────────────────────── */
+
+/* trace:exempt reason=presentational-utilities */
+.founders-timeline,
+/* trace:exempt reason=presentational-utilities */
+.raven-graph {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-rule,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-tick,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-arc {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawPath 1.2s var(--ease-out-quart) forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-rule { animation-duration: 1.6s; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-mark-1 .tl-tick { animation-delay: 500ms; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-mark-2 .tl-tick { animation-delay: 1.2s; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-mark-3 .tl-tick { animation-delay: 1.9s; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-arc-1 { animation-delay: 1.8s; animation-duration: 1.5s; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-arc-2 { animation-delay: 2.5s; animation-duration: 1.5s; }
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-dot,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-halo {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pointPop 500ms var(--ease-out-expo) forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-halo {
+  animation: pointPop 500ms var(--ease-out-expo) forwards, livePulse 2s ease-in-out 1s infinite;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-mark-1 .tl-dot,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-mark-1 .tl-halo { animation-delay: 800ms; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-mark-2 .tl-dot { animation-delay: 1.5s; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-mark-3 .tl-dot,
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-mark-3 .tl-halo { animation-delay: 2.2s; }
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-label {
+  opacity: 0;
+  animation: fadeIn 800ms ease forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-mark-1 .tl-label { animation-delay: 1s; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-mark-2 .tl-label { animation-delay: 1.7s; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .tl-mark-3 .tl-label { animation-delay: 2.4s; }
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .raven-edges {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawPath 2s var(--ease-out-expo) 200ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .raven-nodes {
+  opacity: 0;
+  animation: fadeIn 800ms ease 900ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (prefers-reduced-motion: reduce) {
+  .js-anim .tl-rule,
+  .js-anim .tl-tick,
+  .js-anim .tl-arc,
+  .js-anim .tl-dot,
+  .js-anim .tl-halo,
+  .js-anim .tl-label,
+  .js-anim .raven-edges,
+  .js-anim .raven-nodes {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Product pages + preview gate
+   ───────────────────────────────────────────────────────────── */
+
+/* trace:exempt reason=presentational-utilities */
+.mb-pipeline {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.layer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+  margin: clamp(2rem, 4vw, 3rem) 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.layer-card {
+  padding: 1.375rem 1.25rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-rule);
+  border-radius: 3px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.layer-name {
+  font-size: 0.9375rem;
+  font-weight: 650;
+  color: var(--color-text);
+  margin-bottom: 0.375rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.layer-detail {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.transcript {
+  padding: clamp(1.5rem, 3vw, 2rem);
+  border: 1px solid var(--color-rule);
+  border-left: 2px solid var(--color-accent);
+  border-radius: 3px;
+  background: var(--color-bg-alt);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.transcript-caption {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: 0.75rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.transcript-quote {
+  font-family: var(--font-display);
+  font-size: var(--text-lede);
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--color-text);
+  margin-bottom: 1.5rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.extract-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.extract-grid dt {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: 0.25rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.extract-grid dd {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  margin: 0;
+}
+
+/* ─── Preview gate ─── */
+
+/* trace:exempt reason=presentational-utilities */
+.login-hero {
+  min-height: calc(100dvh - 12rem);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.login-vis {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.login-waveform {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .login-bar {
+  animation: wavePulse 1.6s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .login-bar:nth-child(3n) { animation-delay: 0.2s; }
+/* trace:exempt reason=presentational-utilities */
+.js-anim .login-bar:nth-child(3n + 1) { animation-delay: 0.45s; }
+
+/* trace:exempt reason=presentational-utilities */
+.login-note {
+  margin-top: 1.25rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (prefers-reduced-motion: reduce) {
+  .js-anim .login-bar {
+    animation: none;
+  }
+}
+
+
+/* trace:exempt reason=presentational-utilities */
+@media (prefers-reduced-motion: no-preference) {
+  html:has(:target) {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Signature story: stable box, so swapping stages cannot resize
+   the section and shove the rest of the page around
+   ───────────────────────────────────────────────────────────── */
+
+/* trace:exempt reason=presentational-utilities */
+.story {
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Holds the tallest stage's copy so shorter stages leave a gap instead of
+     collapsing the row. */
+  min-height: 15rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-visual {
+  aspect-ratio: 480 / 400;
+  display: grid;
+  place-items: center;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-visual > *,
+/* trace:exempt reason=presentational-utilities */
+.story-visual svg {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (max-width: 900px) {
+  .story-copy {
+    min-height: 0;
+  }
+}
+
+/* Every top-level section needs a visible edge against the one before it.
+   Sections with their own background already supply one; this covers the rest,
+   which previously ran together with no separation at all. */
+/* trace:exempt reason=presentational-utilities */
+main > section + section {
+  border-top: 1px solid var(--color-rule);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Long-form pages: article prose, figure lists, tables, cards
+   ───────────────────────────────────────────────────────────── */
+
+/* trace:exempt reason=presentational-utilities */
+.prose {
+  max-width: 44rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.prose > * + * {
+  margin-top: 1.25rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.prose h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: 650;
+  line-height: 1.2;
+  color: var(--color-text);
+  margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  padding-top: clamp(1.5rem, 3vw, 2rem);
+  border-top: 1px solid var(--color-rule);
+}
+
+/* The first heading of a section sits under the section's own padding; the
+   extra margin and rule above it left a large empty band. */
+/* trace:exempt reason=presentational-utilities */
+.section-pad > .prose:first-of-type > h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.prose h3 {
+  font-size: 1.0625rem;
+  font-weight: 650;
+  color: var(--color-text);
+  margin-top: 2rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.prose p {
+  font-size: var(--text-body);
+  line-height: 1.75;
+  color: var(--color-text-mid);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.prose a {
+  color: var(--color-accent);
+  text-underline-offset: 2px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.lede {
+  font-size: var(--text-lede);
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+/* Figure lists: value, what it measures, and the source it came from. */
+/* trace:exempt reason=presentational-utilities */
+.figure-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.figure-list > div {
+  padding: 1.25rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-rule);
+  border-radius: 3px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.figure-list dt {
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--color-accent);
+  margin-bottom: 0.5rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.figure-list dd {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.figure-source {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.6875rem;
+  color: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  min-width: 34rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.data-table th,
+/* trace:exempt reason=presentational-utilities */
+.data-table td {
+  text-align: left;
+  padding: 0.75rem 0.875rem;
+  border-bottom: 1px solid var(--color-rule);
+  vertical-align: top;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.data-table th {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.data-table td:first-child {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.note {
+  padding: 1rem 1.125rem;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-alt);
+  border-left: 2px solid var(--color-accent);
+}
+
+/* Index cards for resources and solutions listings. */
+/* trace:exempt reason=presentational-utilities */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  background: var(--color-bg);
+  border: 1px solid var(--color-rule);
+  border-radius: 4px;
+  transition: border-color 200ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.card:hover {
+  border-color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.card-eyebrow {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.card-title {
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.card-title a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.card-title a:hover {
+  color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.card-summary {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+  margin-top: auto;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.page-hero {
+  padding: var(--space-section-y) var(--space-gutter) var(--space-block);
+}
+
+/* trace:exempt reason=presentational-utilities */
+/* .page-hero h1 shares the display size declared with .hero-headline above;
+   only its spacing differs. */
+.page-hero > h1 {
+  max-width: 20ch;
+}
+
+/* Story visuals are stacked and cross-faded rather than swapped, so the
+   contour map mounts once and its draw-in completes instead of restarting
+   every stage. */
+/* trace:exempt reason=presentational-utilities */
+.story-visual {
+  position: relative;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-frame {
+  grid-area: 1 / 1;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 400ms var(--ease-out-quart), visibility 400ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-frame[data-active] {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.story-frame > *,
+/* trace:exempt reason=presentational-utilities */
+.story-frame svg {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (prefers-reduced-motion: reduce) {
+  .story-frame {
+    transition: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Phoenix system map: the whole product family in one view
+   ───────────────────────────────────────────────────────────── */
+
+/* trace:exempt reason=presentational-utilities */
+.system-map {
+  margin: var(--space-block) 0 0;
+  max-width: 56rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.system-map svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.system-map-caption {
+  margin-top: var(--space-tight);
+  max-width: 62ch;
+  font-size: var(--text-small);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-node {
+  cursor: pointer;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-dot {
+  fill: var(--color-text-mid);
+  transition: fill 200ms, r 200ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-halo {
+  fill: var(--color-accent-faint);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-core {
+  fill: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-node-flagship .map-dot {
+  fill: var(--color-accent);
+}
+
+/* Research nodes read as hollow: present, clearly not shipping. */
+/* trace:exempt reason=presentational-utilities */
+.map-node-research .map-dot {
+  fill: var(--color-bg);
+  stroke: var(--color-text-tertiary);
+  stroke-width: 1.5;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-node-name {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  fill: var(--color-text);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-node-centre .map-node-name {
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  fill: var(--color-accent);
+  /* Uppercased visually; the DOM keeps "Raven" for readers and copy/paste. */
+  text-transform: uppercase;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-node-role {
+  font-family: var(--font-body);
+  font-size: 10px;
+  fill: var(--color-text-secondary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-node-status {
+  font-family: var(--font-body);
+  font-size: 8.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-node:hover .map-node-name,
+/* trace:exempt reason=presentational-utilities */
+.map-node:focus-visible .map-node-name {
+  fill: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-node:hover .map-dot {
+  r: 9;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-node:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-edge {
+  opacity: 0.32;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-edge-research {
+  stroke-dasharray: 3 5;
+  opacity: 0.22;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.map-edge-in-development {
+  stroke-dasharray: 5 4;
+  opacity: 0.28;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .map-edge {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawPath 1.4s var(--ease-out-expo) 200ms forwards;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.js-anim .map-edge-research {
+  animation-delay: 600ms;
+}
+
+/* trace:exempt reason=presentational-utilities */
+@media (prefers-reduced-motion: reduce) {
+  .js-anim .map-edge {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Stack the map labels at phone width, where the fixed layout would collide. */
+/* trace:exempt reason=presentational-utilities */
+@media (max-width: 640px) {
+  .system-map svg {
+    min-width: 34rem;
+  }
+
+  .system-map {
+    overflow-x: auto;
+  }
+}
