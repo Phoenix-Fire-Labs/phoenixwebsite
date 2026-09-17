@@ -24,9 +24,9 @@ jobs:
     name: JS/TS analyzers
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: corepack enable
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: yarn
@@ -43,28 +43,32 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --no-install oxlint --type-aware --format checkstyle > oxlint.xml || true
+          npx --no-install oxlint --type-aware --format checkstyle \
+            > "$RUNNER_TEMP/oxlint.xml" || true
           reviewdog -f=checkstyle -name=oxlint -reporter=${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }} \
-            -filter-mode=nofilter -fail-level=any < oxlint.xml
+            -filter-mode=nofilter -fail-level=any < "$RUNNER_TEMP/oxlint.xml"
 
       # Dead exports, unused files and unused dependencies.
       - name: knip
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          yarn knip --reporter json > knip.json || true
-          node scripts/rdjson.mjs knip < knip.json \
+          yarn knip --reporter json > "$RUNNER_TEMP/knip.json" || true
+          node scripts/rdjson.mjs knip < "$RUNNER_TEMP/knip.json" \
             | reviewdog -f=rdjson -name=knip -reporter=${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }} \
               -filter-mode=nofilter -fail-level=any
 
       # React correctness, scoped to first-party source. The vendored rule
-      # implementations under tools/ are not ours to fix.
+      # implementations under tools/ are not ours to fix. react-doctor accepts
+      # one project directory or a list of files, never a directory plus more
+      # arguments, so this passes src and nothing else.
       - name: react-doctor
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --no-install react-doctor src e2e --json --json-out react-doctor.json --no-supply-chain || true
-          node scripts/rdjson.mjs react-doctor < react-doctor.json \
+          npx --no-install react-doctor src --json --no-supply-chain \
+            > "$RUNNER_TEMP/react-doctor.json" || true
+          node scripts/rdjson.mjs react-doctor < "$RUNNER_TEMP/react-doctor.json" \
             | reviewdog -f=rdjson -name=react-doctor -reporter=${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }} \
               -filter-mode=nofilter -fail-level=any
 
@@ -74,8 +78,9 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --no-install madge --circular --extensions ts,tsx src e2e > madge.txt || true
-          node scripts/rdjson.mjs madge < madge.txt \
+          npx --no-install madge --circular --extensions ts,tsx src e2e \
+            > "$RUNNER_TEMP/madge.txt" || true
+          node scripts/rdjson.mjs madge < "$RUNNER_TEMP/madge.txt" \
             | reviewdog -f=rdjson -name=madge -reporter=${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }} \
               -filter-mode=nofilter -fail-level=any
 
@@ -83,9 +88,9 @@ jobs:
     name: Config analyzers
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: corepack enable
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: yarn
