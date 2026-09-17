@@ -26,7 +26,7 @@ Run the BugHunt defense suite in CI
 
 ### 5. Carry forward the knowledge entries the merge of PR 10 left behind
 
-<!-- trace:v1 id=TASK-PHO-P8JA0VD0 type=task state=TODO work=WORK-PHO-JG8WSYBA implements=PLAN-PHO-6D96QCEB -->
+<!-- trace:v1 id=TASK-PHO-P8JA0VD0 type=task state=DONE work=WORK-PHO-JG8WSYBA implements=PLAN-PHO-6D96QCEB -->
 
 ## Current state
 

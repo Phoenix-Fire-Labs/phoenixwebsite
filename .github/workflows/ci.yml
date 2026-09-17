@@ -34,14 +34,14 @@ jobs:
       - run: uv tool install tracelayer==0.9.1
       - run: rm -f tsconfig.tsbuildinfo && trace verify --changed
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: junit-unit
           path: junit-unit.xml
           retention-days: 7
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: next-build
@@ -70,7 +70,7 @@ jobs:
       # verification needs the suites' outcomes bound to this commit. Without
       # ingestion the gate can never be satisfied from CI, which made it
       # unenforceable exactly where it matters.
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: junit-unit
 
@@ -80,7 +80,7 @@ jobs:
       - run: trace evidence ingest --normalized evidence.json --revision "$GITHUB_SHA" --provider github-actions --workflow ci
       - run: trace verify --lifecycle merge
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report
