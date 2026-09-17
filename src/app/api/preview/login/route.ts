@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   // boundary; the check below IS the decoder. String(File) would stringify to
   // "[object File]" and then be compared as if it were a password.
   const passwordField = form.get("password");
-  // eslint-disable-next-line anti-slop/no-runtime-typeof -- this IS the I/O boundary decoder.
+  // oxlint-disable-next-line anti-slop/no-runtime-typeof -- this IS the I/O boundary decoder.
   const submitted = typeof passwordField === "string" ? passwordField : "";
   const redirectTo = safeRedirect(form.get("redirect"), SITE_ORIGIN_FOR_PARSE);
 

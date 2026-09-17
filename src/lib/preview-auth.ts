@@ -101,7 +101,7 @@ export function createSessionToken(secret: string): string {
 
 // trace:v1 id=impl.preview-auth work=WORK-PHO-MB4M5AH6 satisfies=REQ-PHO-EM6MDMQA
 export function verifySessionToken(token: string | null | undefined, secret: string): boolean {
-  // eslint-disable-next-line anti-slop/no-runtime-typeof -- cookie value arrives unparsed; this IS the decoder.
+  // oxlint-disable-next-line anti-slop/no-runtime-typeof -- cookie value arrives unparsed; this IS the decoder.
   if (typeof token !== "string") return false;
   const parts = token.split(".");
 

@@ -34,7 +34,7 @@ const MIN_DWELL_MS = 4000;
 
 /** Validate one briefing submission; bot-like passes validation but never sends. */
 // trace:v1 id=impl.briefing-validation work=WORK-PHO-18KENMFK satisfies=REQ-PHO-9Q311JSZ
-// eslint-disable-next-line anti-slop/no-unknown-parameters -- unknown request payload IS the input; safeParse below is the decoder.
+// oxlint-disable-next-line anti-slop/no-unknown-parameters -- unknown request payload IS the input; safeParse below is the decoder.
 export function validateBriefing(payload: unknown, now = Date.now()): BriefingAccepted | BriefingFailure {
   const parsed = BriefingSchema.safeParse(payload);
 

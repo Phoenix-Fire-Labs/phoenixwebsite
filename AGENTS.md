@@ -3007,3 +3007,55 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Lint configuration
+
+`.oxlintrc.json` must stay **strict JSON with no comments**. CI validates it
+against `node_modules/oxlint/configuration_schema.json` via `check-jsonschema`,
+which has no JSON5 mode. This matters more than it looks: oxlint exits 0 when
+its config fails to parse, having linted nothing, so an unknown key turns the
+lint gate into a silent no-op that CI reports green. Schema validation catches
+that at review time and `scripts/lint.mjs` catches it at run time.
+
+The `anti-slop-effect/*` rules are set to `"off"` because `package.json` has no
+`effect` dependency and those rules match on syntax (`_tag` properties, `makeX`
+imports), so ordinary discriminated unions get reported. Re-enable them if
+Effect is adopted.
+
+### Type-aware rules run through oxlint, not typescript-eslint
+
+`yarn lint` passes `--type-aware`, which oxlint services through `tsgolint`
+(the `oxlint-tsgolint` package). The `typescript/*` rules in `.oxlintrc.json`
+are the type-aware set.
+
+Do not reintroduce an `eslint.config.mjs` with `typescript-eslint` for this.
+typescript-eslint throws on import when `typescript` reports major >= 7 --
+see `typescript-eslint/dist/index.js`, which reads `ts.versionMajorMinor` and
+refuses outright -- and this project is pinned to TypeScript 7.0.2. Upstream
+tracking is typescript-eslint#10940. tsgolint is built on the typescript-go
+engine that TypeScript 7 itself uses, so it has no such conflict.
+
+Note that a stale `node_modules` can mask this: an eslint config will appear to
+work until the next clean `yarn install --immutable`, which is what CI runs.
+
+`use-unknown-in-catch-callback` is not implemented by tsgolint. Adding an
+unsupported rule name makes oxlint fail config parsing and lint nothing, so
+verify any new `typescript/*` rule with `yarn lint` before committing.
+
+`eslint`, `@eslint/js` and `typescript-eslint` are deliberately **not**
+dependencies. They cannot run here, and their presence was the main source of
+the peer-dependency warnings in install logs.
+
+### The one install warning that remains
+
+```
+YN0060: typescript is listed by your project with version 7.0.2, which doesn't
+        satisfy what madge requests (^5.4.4)
+```
+
+madge declares `typescript` as an *optional* peer at `^5.4.4`. It is cosmetic:
+madge only needs TypeScript to parse `.ts` files for the circular-import scan,
+and that scan works (verified against `src` and `e2e`). A `packageExtensions`
+entry widening madge's range does **not** silence it -- Yarn still reports the
+original range even after `yarn install --refresh-lockfile` -- so do not add
+one back; it looks like configuration that works and does nothing.

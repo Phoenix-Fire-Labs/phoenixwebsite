@@ -1,0 +1,168 @@
+name: Analyzers
+
+# The individual analyzers BugHunt wraps, each gating on its own exit code and
+# reporting inline through reviewdog. BugHunt itself is a local triage tool: it
+# runs every rule at maximum strictness and exits 0 regardless of findings, so
+# it cannot gate. See docs/adrs/run-the-bughunt-defense-suite-in-ci.md.
+#
+# Every analyzer here is green as of wiring. A gate that is red on arrival
+# teaches the team to ignore it.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  # reviewdog needs these to post inline comments and check annotations.
+  pull-requests: write
+  checks: write
+
+jobs:
+  javascript:
+    name: JS/TS analyzers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: corepack enable
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: yarn
+      - run: yarn install --immutable
+      - uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      # oxlint, including its type-aware rules (tsgolint). checkstyle is a
+      # native output format. `yarn lint` in ci.yml is the hard gate -- it also
+      # fails on a malformed config, which produces no findings at all and would
+      # otherwise report green. This step exists to place the inline comments.
+      - name: oxlint
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx --no-install oxlint --type-aware --format checkstyle \
+            > "$RUNNER_TEMP/oxlint.xml" || true
+          reviewdog -f=checkstyle -name=oxlint -reporter=${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }} \
+            -filter-mode=nofilter -fail-level=any < "$RUNNER_TEMP/oxlint.xml"
+
+      # Dead exports, unused files and unused dependencies.
+      - name: knip
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          yarn knip --reporter json > "$RUNNER_TEMP/knip.json" || true
+          node scripts/rdjson.mjs knip < "$RUNNER_TEMP/knip.json" \
+            | reviewdog -f=rdjson -name=knip -reporter=${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }} \
+              -filter-mode=nofilter -fail-level=any
+
+      # React correctness, scoped to first-party source. The vendored rule
+      # implementations under tools/ are not ours to fix. react-doctor accepts
+      # one project directory or a list of files, never a directory plus more
+      # arguments, so this passes src and nothing else.
+      - name: react-doctor
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx --no-install react-doctor src --json --no-supply-chain \
+            > "$RUNNER_TEMP/react-doctor.json" || true
+          node scripts/rdjson.mjs react-doctor < "$RUNNER_TEMP/react-doctor.json" \
+            | reviewdog -f=rdjson -name=react-doctor -reporter=${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }} \
+              -filter-mode=nofilter -fail-level=any
+
+      # Circular imports. `--extensions ts,tsx` is required: without it madge
+      # defaults to js/jsx and silently processes zero files in src/.
+      - name: madge
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx --no-install madge --circular --extensions ts,tsx src e2e \
+            > "$RUNNER_TEMP/madge.txt" || true
+          node scripts/rdjson.mjs madge < "$RUNNER_TEMP/madge.txt" \
+            | reviewdog -f=rdjson -name=madge -reporter=${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }} \
+              -filter-mode=nofilter -fail-level=any
+
+  config:
+    name: Config analyzers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: corepack enable
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: yarn
+      - run: yarn install --immutable
+      - uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      # Workflow syntax and action inputs. This caught a broken re-indent of
+      # njsscan.yml that yamllint alone reported as clean.
+      #
+      # This also covers shellcheck: actionlint runs shellcheck over every
+      # `run:` block, which is the only shell this repository has. A standalone
+      # shellcheck step was removed -- the repo contains no .sh files of its
+      # own, so it only ever reported findings in node_modules and vendored
+      # tooling. Re-add it with node_modules excluded if real scripts appear.
+      - uses: reviewdog/action-actionlint@v1
+        with:
+          reporter: ${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }}
+          filter_mode: nofilter
+          fail_level: any
+
+      # line-length, truthy and document-start are disabled: GitHub workflow
+      # YAML conventionally omits `---`, `on:` is legitimately truthy, and an
+      # 80-column limit is arbitrary for workflow files.
+      - uses: reviewdog/action-yamllint@v1
+        with:
+          reporter: ${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }}
+          filter_mode: nofilter
+          fail_level: any
+          yamllint_flags: >-
+            -d "{extends: default, rules: {line-length: disable,
+            truthy: disable, document-start: disable}}"
+            .github/ .yarnrc.yml
+
+      - name: Install TOML and schema tooling
+        run: |
+          pipx install check-jsonschema
+          curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-linux-x86_64.gz \
+            | gunzip > /usr/local/bin/taplo
+          chmod +x /usr/local/bin/taplo
+
+      - name: taplo
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          taplo lint .trace/policy.toml .trace/trace.toml .trace/work.toml bughunt.toml > taplo.txt 2>&1 || true
+          node scripts/rdjson.mjs taplo < taplo.txt \
+            | reviewdog -f=rdjson -name=taplo -reporter=${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }} \
+              -filter-mode=nofilter -fail-level=any
+
+      # Schema-validates the lint config. oxlint exits 0 when its config
+      # cannot be parsed, having linted nothing, so an unknown key otherwise
+      # turns the lint gate into a silent no-op that CI reports green.
+      - name: check-jsonschema
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          check-jsonschema --schemafile node_modules/oxlint/configuration_schema.json \
+            --output-format JSON .oxlintrc.json > jsonschema.json 2>&1 || true
+          node scripts/rdjson.mjs jsonschema < jsonschema.json \
+            | reviewdog -f=rdjson -name=check-jsonschema -reporter=${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }} \
+              -filter-mode=nofilter -fail-level=any
+
+      - name: Install dotenv-linter
+        run: curl -fsSL https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: dotenv-linter
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dotenv-linter check .env.example > dotenv.txt 2>&1 || true
+          node scripts/rdjson.mjs dotenv < dotenv.txt \
+            | reviewdog -f=rdjson -name=dotenv-linter -reporter=${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }} \
+              -filter-mode=nofilter -fail-level=any

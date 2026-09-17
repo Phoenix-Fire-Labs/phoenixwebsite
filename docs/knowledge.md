@@ -173,6 +173,14 @@ The failing e2e run was the signal that the security control was wrong, not that
 
 `src/lib/rate-limit.ts` and any future auth endpoint. Note the limiter is per-isolate memory — a tripwire, not a control; the durable rule is a platform WAF policy that is still not checked in.
 
+Two further defects reviewers found in the same limiter, both worth checking in any implementation:
+
+**The bucket grew while refusing.** Every request reached `recent.push(now)`, including requests already over budget, so a caller being actively refused could grow its own array without bound and make each later prune more expensive. Under attack the limiter amplified the attack. Stop recording once the bucket is full.
+
+**Silent success is worse than an error.** The contact endpoint answered a throttled submission with `ok: true` and discarded it, on the theory that telling a bot it was throttled leaked information. For a human on a shared agency NAT that meant being told "Received" while the briefing went nowhere — the worst outcome for exactly the audience the form exists to serve. A bot can infer throttling anyway. Return 429 with a message and a direct-contact fallback.
+
+Generalizing: never report success for work you dropped. If a request cannot be honoured, the caller has to be able to tell.
+
 ## Clearing trace hook obligations and binding test evidence
 
 <!-- trace:v1 id=CONV-PHO-TP1RBRP1 type=convention state=ACTIVE work=WORK-PHO-18KENMFK -->
@@ -220,6 +228,12 @@ Related: hand-authored section headings in this file must each be preceded by
 ### Examples
 
 Order that worked: add honest `verifies=` edges -> `trace review <node>` for each stale test node -> run the suites with JUnit reporters -> generate normalized evidence -> ingest -> gitignore the artifacts.
+
+Two further details, learned by hitting them a second time:
+
+**Evidence is bound to a revision, so ingest last.** `trace evidence ingest --revision <sha>` binds to that exact commit. Finalizing, then making one more commit, re-opens TL021 immediately -- the receipts no longer match HEAD and `trace task finish` blocks again with no new test failure. Do the ingest-and-finish sequence after the final commit of a change set, not in the middle of one.
+
+**Stale nodes come from touching the file, not the node.** Appending a new entry to the end of this file staled three unrelated nodes near the top (`ANTI-`, `CONSTRAINT-`, `LEARN-`), because staleness is computed per file rather than per node. `trace review <id>` moves each STALE_REVIEW_REQUIRED node to REVIEWED_NEEDS_VERIFICATION and is a claim that the content is still correct, so read the node before reviewing it -- the whole point is defeated by acknowledging blind.
 
 <!-- trace:inherit CONV-PHO-TP1RBRP1 reason="template section" -->
 ### Applies to
@@ -342,3 +356,247 @@ Expose each family with `variable: "--font-x"` and map it in CSS (`--font-displa
 ### Applies to
 
 `src/app/layout.tsx`, `src/app/globals.css` font tokens, and the CSP in `next.config.ts` — when font delivery changes, re-check the CSP.
+
+## Shared chrome in the root layout leaks the private site to the gate page
+
+<!-- trace:v1 id=ANTI-PHO-ZJ1SB425 type=anti_pattern state=ACTIVE work=WORK-PHO-MB4M5AH6 applies_to=impl.app-shell -->
+
+<!-- trace:inherit ANTI-PHO-ZJ1SB425 reason="template section" -->
+### Pattern
+
+Put `SiteHeader`, `SiteFooter` and the site-wide `metadata` in `src/app/layout.tsx`, then add an authentication or preview-gate route at `src/app/login/`.
+
+<!-- trace:inherit ANTI-PHO-ZJ1SB425 reason="template section" -->
+### Why
+
+It looks like the obvious place: one layout, every page gets the chrome, and `metadata` inheritance means each route only overrides its `title`.
+
+<!-- trace:inherit ANTI-PHO-ZJ1SB425 reason="template section" -->
+### Consequence
+
+The gate inherits all of it. On this repository an unauthenticated visitor to `/login` — the one page a stranger can reach — received **64 mentions of the six product names**, because the header dropdown, the footer sitemap and the inherited `description` / `keywords` / `og:description` / `twitter:description` all enumerate the product family. The gate existed specifically to withhold that positioning.
+
+Overriding only `title` is not enough; `metadata` merges field by field, so the marketing `description` and social cards survive into the gated page unless each is overridden explicitly.
+
+A reviewer caught this. It was invisible locally because every manual check was made while authenticated.
+
+<!-- trace:inherit ANTI-PHO-ZJ1SB425 reason="template section" -->
+### Correct approach
+
+Move the marketing routes into a route group (`src/app/(site)/`) whose layout owns the chrome, and leave the gate outside it. The root layout keeps only the document shell — `html`, `body`, fonts, the pre-paint script. The gate then supplies its own minimal header and footer and overrides `description`, `keywords`, `openGraph` and `twitter`.
+
+Verify by scraping the gate unauthenticated rather than by reading the code:
+
+```
+curl -s http://host/login | grep -oE "Product1|Product2|..." | sort | uniq -c
+```
+
+Expect no output. An e2e test asserts this over the whole product registry, so a new product cannot reintroduce the leak.
+
+<!-- trace:inherit ANTI-PHO-ZJ1SB425 reason="template section" -->
+### Applies to
+
+Any Next.js App Router site with a login, paywall or preview gate and shared chrome. The same reasoning covers generated social images: a dynamic `opengraph-image` route renders the headline and product names, so exempting it from the gate publishes the same content.
+
+## oxlint exits 0 when its config cannot be parsed
+
+<!-- trace:v1 id=FIND-PHO-HYW0H29T type=finding state=ACTIVE work=WORK-PHO-MB4M5AH6 -->
+
+<!-- trace:inherit FIND-PHO-HYW0H29T reason="template section" -->
+### Context
+
+A stray key was added to `.oxlintrc.json`. The next `yarn lint` reported zero errors, and a previously-reported error had disappeared.
+
+<!-- trace:inherit FIND-PHO-HYW0H29T reason="template section" -->
+### Finding
+
+`oxlint` writes `Failed to parse oxlint configuration file` and then **exits 0, having linted nothing**. The lint gate becomes a silent no-op that CI reports as green.
+
+This is worse than a normal failure because the signal inverts: a broken config looks exactly like a clean codebase. It was caught only because a real error vanished after a change that touched no TypeScript.
+
+Related trap in the same file: `.oxlintrc.json` accepts JSONC comments, but an unknown top-level key is rejected outright. Record rationale as a comment, never as a `$note`-style key.
+
+<!-- trace:inherit FIND-PHO-HYW0H29T reason="template section" -->
+### Evidence
+
+```
+$ yarn lint            # with a bogus key
+Failed to parse oxlint configuration file.
+  x unknown field `$note_...`, expected one of `$schema`, `plugins`, ...
+$ echo $?
+0
+```
+
+<!-- trace:inherit FIND-PHO-HYW0H29T reason="template section" -->
+### Consequence
+
+Any check whose tool can fail silently needs its own assertion. `scripts/lint.mjs` now runs oxlint, forwards the output, and exits 1 if the parse-failure string appears. Verified against three cases: valid config passes, broken config fails, and a real lint error is still reported.
+
+<!-- trace:inherit FIND-PHO-HYW0H29T reason="template section" -->
+### Applies to
+
+`yarn lint`. More generally: when wiring a quality gate, test that it **fails** when it should, not only that it passes. A gate never observed failing is not known to work.
+
+## storageState is not a Chromium profile, so Lighthouse audited the login page
+
+<!-- trace:v1 id=FIND-PHO-KWDMDNBT type=finding state=ACTIVE work=WORK-PHO-MB4M5AH6 -->
+
+<!-- trace:inherit FIND-PHO-KWDMDNBT reason="template section" -->
+### Context
+
+`scripts/lighthouse.mjs` seeded a preview session with Playwright, then handed the directory to chrome-launcher as a `userDataDir` and ran Lighthouse against the homepage.
+
+<!-- trace:inherit FIND-PHO-KWDMDNBT reason="template section" -->
+### Finding
+
+`context.storageState({ path: dir + "/state.json" })` writes **Playwright own cookie/origin JSON**. It does not turn the containing directory into a Chromium user-data profile. chrome-launcher therefore started a clean, unauthenticated browser, the gate redirected it to `/login`, and Lighthouse scored the login page while reporting the homepage URL.
+
+Nothing failed. The scores looked plausible, which is why it survived review until a reviewer read the mechanism rather than the output.
+
+A wrong password behaved the same way: the seeding step failed, the script continued, and the audit ran anyway.
+
+<!-- trace:inherit FIND-PHO-KWDMDNBT reason="template section" -->
+### Evidence
+
+After switching to `chromium.launchPersistentContext(dir)` — which does write a real profile — and asserting the homepage rendered before auditing, the scores changed to 0.97 performance / 0.96 accessibility / 1.0 best-practices. A deliberately wrong password now exits with `preview login failed: ... did not render the homepage`.
+
+<!-- trace:inherit FIND-PHO-KWDMDNBT reason="template section" -->
+### Consequence
+
+Any audit run behind an auth gate has to prove it is authenticated before measuring. Assert on page content, not on the absence of an error.
+
+<!-- trace:inherit FIND-PHO-KWDMDNBT reason="template section" -->
+### Applies to
+
+`scripts/lighthouse.mjs`, and any tool handed a "profile" directory produced by something other than the browser itself.
+
+## Redirecting an analyzer's report into the checkout can destroy its own config
+
+<!-- trace:v1 id=FIND-PHO-RPTCLOB1 type=finding state=ACTIVE work=WORK-PHO-JG8WSYBA -->
+
+<!-- trace:inherit FIND-PHO-RPTCLOB1 reason="template section" -->
+### Context
+
+Wiring knip into CI. The natural-looking form is `yarn knip --reporter json > knip.json`, because the tool is knip and the report is JSON.
+
+<!-- trace:inherit FIND-PHO-RPTCLOB1 reason="template section" -->
+### Finding
+
+`knip.json` is knip's **configuration** file. The redirect truncated it before knip started, so knip read a zero-byte file and failed with `Error parsing /.../knip.json`. The report destroyed the config that produced it.
+
+The shell opens the redirect target before the command runs, so this is not a race and cannot be fixed by ordering. The general shape: a tool named X, configured by `X.json`, asked to write its report to `X.json`.
+
+This cannot reproduce when the report is consumed from a pipe, which is how it was exercised locally, so the tree stayed clean and the bug only appeared in CI.
+
+<!-- trace:inherit FIND-PHO-RPTCLOB1 reason="template section" -->
+### Evidence
+
+```
+ERROR: Error loading /home/runner/work/phoenixwebsite/phoenixwebsite/knip.json
+Reason: Error parsing /home/runner/work/phoenixwebsite/phoenixwebsite/knip.json
+```
+
+<!-- trace:inherit FIND-PHO-RPTCLOB1 reason="template section" -->
+### Consequence
+
+Every analyzer in `.github/workflows/analyzers.yml` writes its report to `"$RUNNER_TEMP"`, never into the checkout. A report is build output; the checkout is input.
+
+Corollary found in the same run: when a report file is missing, `cmd < missing.json` fails at the redirect and reviewdog receives empty input, reporting a confusing `proto: syntax error` rather than the real cause.
+
+<!-- trace:inherit FIND-PHO-RPTCLOB1 reason="template section" -->
+### Applies to
+
+Any CI step redirecting tool output to a path inside the repository. Write reports outside the checkout, and prefer a pipe when the consumer can take one.
+
+## typescript-eslint cannot run against TypeScript 7
+
+<!-- trace:v1 id=FIND-PHO-TSE7BLCK type=finding state=ACTIVE work=WORK-PHO-JG8WSYBA -->
+
+<!-- trace:inherit FIND-PHO-TSE7BLCK reason="template section" -->
+### Context
+
+Adding the type-aware lint rules oxlint could not express, via an `eslint.config.mjs` using `typescript-eslint`. It worked locally for an entire session: it linted, and it reported real `@typescript-eslint/require-await` findings.
+
+<!-- trace:inherit FIND-PHO-TSE7BLCK reason="template section" -->
+### Finding
+
+`typescript-eslint` reads `ts.versionMajorMinor` at import time and **throws outright** when the major version is 7 or above. This project is pinned to TypeScript 7.0.2, so a clean install can never run it. Upstream tracking is typescript-eslint#10940.
+
+It appeared to work because `node_modules` was stale. The first `yarn install --immutable` after a branch change repaired the tree to what the lockfile actually pins, and every ESLint invocation began throwing. CI installs from the lockfile every time, so CI would have failed on arrival.
+
+oxlint's `--type-aware` mode (the `oxlint-tsgolint` package) covers the same rule family and is built on the typescript-go engine TypeScript 7 itself uses, so it has no such conflict. It found two genuine defects immediately: an `await` on chrome-launcher's `kill()`, which returns `void`, and an `async` function with no `await`.
+
+<!-- trace:inherit FIND-PHO-TSE7BLCK reason="template section" -->
+### Evidence
+
+```
+$ npx eslint .
+typescript-eslint does not support TS 7.0.
+Error: typescript-eslint does not support TS 7.0.
+    at Object.<anonymous> (node_modules/typescript-eslint/dist/index.js:52:11)
+$ node -e "console.log(require.resolve('typescript',{paths:['./node_modules/typescript-eslint']}))"
+/Users/rocket/phoenixwebsite/node_modules/typescript/package.json 7.0.2
+```
+
+<!-- trace:inherit FIND-PHO-TSE7BLCK reason="template section" -->
+### Consequence
+
+Type-aware linting runs through `yarn lint` (`oxlint --type-aware`). AGENTS.md records this so the eslint route is not attempted again.
+
+<!-- trace:inherit FIND-PHO-TSE7BLCK reason="template section" -->
+### Applies to
+
+Any tool that reaches into the TypeScript compiler API on this repository. More generally: a green local run proves nothing when `node_modules` has drifted from the lockfile. Before trusting a newly wired gate, reinstall from the lockfile and run it again -- that is what CI does.
+
+
+## Vercel without Corepack runs Yarn 1, which silently discards --immutable
+
+<!-- trace:v1 id=FIND-PHO-YRN1IMTB type=finding state=ACTIVE work=WORK-PHO-JG8WSYBA -->
+
+<!-- trace:inherit FIND-PHO-YRN1IMTB reason="template section" -->
+### Context
+
+A production build log showed a 241-second install and a wall of peer-dependency warnings. `package.json` pins `"packageManager": "yarn@4.18.0"` and `vercel.json` ran `yarn install --immutable`, so both looked correct.
+
+<!-- trace:inherit FIND-PHO-YRN1IMTB reason="template section" -->
+### Finding
+
+Vercel honours `packageManager` only when Corepack is enabled. Without it the builder runs its bundled **yarn 1.22.19**, which cannot read a Yarn 4 lockfile (`__metadata: version: 10`). It ignored `yarn.lock` entirely, re-resolved the whole tree from the registry, and wrote its own lockfile -- which is what the slow install and the warnings actually were.
+
+The serious part is not the speed. **`--immutable` is not a Yarn 1 flag, and Yarn 1 ignores unknown flags without complaint.** So the deployed dependency tree was whatever the registry resolved at build time, not what the lockfile pinned, while the configuration read as though integrity were enforced. Nothing in the log says the flag was dropped.
+
+`corepack yarn install --immutable` fixes it without depending on the `ENABLE_EXPERIMENTAL_COREPACK` project variable and without `corepack enable` mutating global shims. `COREPACK_ENABLE_DOWNLOAD_PROMPT=0` stops Corepack prompting before it fetches the pinned version on a non-TTY builder. `buildCommand` needs the same treatment or the build step falls back to Yarn 1 after a Yarn 4 install.
+
+<!-- trace:inherit FIND-PHO-YRN1IMTB reason="template section" -->
+### Evidence
+
+Before:
+
+```
+Running "install" command: `yarn install --immutable`...
+yarn install v1.22.19
+warning package.json: No license field
+[3/4] Linking dependencies...
+success Saved lockfile.          <- rewrote the lockfile it could not read
+Done in 241.54s.
+```
+
+After:
+
+```
+Running "install" command: `COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack yarn install --immutable`...
+YN0000: · Yarn 4.18.0
+YN0000: · Done with warnings in 11s 772ms
+```
+
+241.5s -> 11.8s, and the yarn-1 warning classes ("No license field", "Workspaces can only be enabled in private projects", the peer spam) disappear because they were artifacts of yarn 1 re-resolving.
+
+<!-- trace:inherit FIND-PHO-YRN1IMTB reason="template section" -->
+### Consequence
+
+Check `yarn install --immutable` passes locally before enforcing it on a builder, so switching to a real immutable install cannot fail the deploy on pre-existing lockfile drift.
+
+<!-- trace:inherit FIND-PHO-YRN1IMTB reason="template section" -->
+### Applies to
+
+`vercel.json`. Generally: confirm which package manager a hosted builder actually ran by reading its version line in the log, rather than inferring it from `packageManager`. A flag that the wrong tool silently drops is worse than one that errors -- the log looks like the guarantee is in force.
