@@ -13,10 +13,7 @@
     "scripts/*.mjs"
   ],
   "ignoreDependencies": [
-    "@eslint/js",
-    "eslint",
     "publint",
-    "tailwindcss",
-    "typescript-eslint"
+    "tailwindcss"
   ]
 }

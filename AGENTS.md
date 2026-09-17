@@ -3041,3 +3041,21 @@ work until the next clean `yarn install --immutable`, which is what CI runs.
 `use-unknown-in-catch-callback` is not implemented by tsgolint. Adding an
 unsupported rule name makes oxlint fail config parsing and lint nothing, so
 verify any new `typescript/*` rule with `yarn lint` before committing.
+
+`eslint`, `@eslint/js` and `typescript-eslint` are deliberately **not**
+dependencies. They cannot run here, and their presence was the main source of
+the peer-dependency warnings in install logs.
+
+### The one install warning that remains
+
+```
+YN0060: typescript is listed by your project with version 7.0.2, which doesn't
+        satisfy what madge requests (^5.4.4)
+```
+
+madge declares `typescript` as an *optional* peer at `^5.4.4`. It is cosmetic:
+madge only needs TypeScript to parse `.ts` files for the circular-import scan,
+and that scan works (verified against `src` and `e2e`). A `packageExtensions`
+entry widening madge's range does **not** silence it -- Yarn still reports the
+original range even after `yarn install --refresh-lockfile` -- so do not add
+one back; it looks like configuration that works and does nothing.
