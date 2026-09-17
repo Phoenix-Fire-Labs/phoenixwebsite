@@ -10,6 +10,9 @@ const gated = process.env.SITE_PREVIEW_GATED !== "false";
 
 const nextConfig: NextConfig = {
   // trace:v1 id=ops.next-config work=WORK-PHO-MB4M5AH6 satisfies=REQ-PHO-EM6MDMQA
+  // NextConfig types headers() as returning a Promise, so `async` is required
+  // by the framework signature even with no await in the body.
+  // oxlint-disable-next-line typescript/require-await
   async headers() {
     return [
       {

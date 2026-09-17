@@ -13,12 +13,10 @@
     "scripts/*.mjs"
   ],
   "ignoreDependencies": [
-    "tailwindcss",
     "@eslint/js",
     "eslint",
-    "typescript-eslint",
-    "react-doctor",
-    "madge",
-    "publint"
+    "publint",
+    "tailwindcss",
+    "typescript-eslint"
   ]
 }

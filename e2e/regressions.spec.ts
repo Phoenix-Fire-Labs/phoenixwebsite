@@ -355,7 +355,12 @@ test("a throttled briefing is reported, not silently dropped", async ({ page }) 
 
     if (response.status() === 429) {
       throttled = i;
-      expect((await response.json()).ok, "throttled response must not claim success").toBe(false);
+
+      // SAFETY: the route answers a throttled request with {ok:false,fields},
+      // so `ok` is the only field asserted here and is optional in the type.
+      const payload = (await response.json()) as { ok?: boolean };
+
+      expect(payload.ok, "throttled response must not claim success").toBe(false);
       break;
     }
   }

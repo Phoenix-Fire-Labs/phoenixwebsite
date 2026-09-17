@@ -87,5 +87,5 @@ try {
     process.exit(1);
   }
 } finally {
-  await chrome.kill();
+  chrome.kill();
 }

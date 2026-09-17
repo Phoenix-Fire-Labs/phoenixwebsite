@@ -27,9 +27,6 @@
       "specifier": "./tools/oxlint/anti-slop/effect/index.ts"
     }
   ],
-  // anti-slop-effect/* are "off": package.json has no `effect` dependency, and
-  // these rules match on syntax (_tag, makeX imports), so ordinary discriminated
-  // unions get reported. Re-enable when Effect is adopted.
   "rules": {
     "oxc/no-accumulating-spread": "error",
     "anti-slop/no-array-filter-map": "error",
@@ -54,6 +51,19 @@
     "anti-slop-effect/no-manual-tag-comparison": "off",
     "anti-slop-effect/no-manual-tagged-construction": "off",
     "anti-slop-effect/no-service-constructor-imports": "off",
-    "anti-slop-effect/prefer-effect-match": "off"
+    "anti-slop-effect/prefer-effect-match": "off",
+    "typescript/no-floating-promises": "error",
+    "typescript/no-misused-promises": "error",
+    "typescript/await-thenable": "error",
+    "typescript/require-await": "error",
+    "typescript/no-base-to-string": "error",
+    "typescript/no-confusing-void-expression": "error",
+    "typescript/restrict-template-expressions": "error",
+    "typescript/no-unnecessary-type-assertion": "error",
+    "typescript/prefer-promise-reject-errors": "error",
+    "typescript/no-implied-eval": "error",
+    "typescript/no-for-in-array": "error",
+    "typescript/no-array-delete": "error",
+    "typescript/switch-exhaustiveness-check": "error"
   }
 }
