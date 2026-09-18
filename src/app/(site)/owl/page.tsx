@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { canonicalFor } from "@/lib/seo";
 import { ProductPage } from "@/components/products/ProductPage";
+import { ResearchHorizon } from "@/components/visuals/ResearchHorizon";
 import { productBySlug } from "@/lib/product-status";
 
 const product = productBySlug("owl")!;
@@ -16,6 +17,7 @@ export default function OwlPage() {
   return (
     <ProductPage
       product={product}
+      visual={<ResearchHorizon name="Owl" reads="Raven" constraints={["gloves", "smoke", "glare", "hands busy"]} />}
       lede="Owl explores an augmented-reality field interface reading from Raven, putting the operational picture in front of crews on the line. It is a research direction, not a product you can buy."
       sections={[
         {

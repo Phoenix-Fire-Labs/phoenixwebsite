@@ -9,8 +9,21 @@ import { PRODUCTS, productBySlug } from "@/lib/product-status";
  *  research on the outer), it renders identically without JavaScript, and
  *  every node is a crawlable, focusable link. */
 // trace:v1 id=impl.visual-system-map work=WORK-PHO-32N4ZH5K satisfies=REQ-PHO-3YJG08V6
-export function PhoenixSystemMap() {
+export function PhoenixSystemMap({
+  engaged,
+  caption,
+}: {
+  /** Slugs to emphasise. Everything else dims, so a page can show which part
+   *  of the family it is about without drawing a second, divergent diagram.
+   *  Omitted means the whole family reads at equal weight. */
+  engaged?: string[];
+  /** Replaces the default caption when the emphasis changes what the figure
+   *  is saying. */
+  caption?: string;
+} = {}) {
   const centre = productBySlug("raven");
+  // trace:exempt reason=internal-detail -- emphasis class predicate
+  const dim = (slug: string) => (engaged && !engaged.includes(slug) ? " map-node-dim" : "");
 
   // Fixed positions: the two flagships flank Raven on the operating axis,
   // Albatross sits ahead of it, and the research pair sits furthest out.
@@ -50,7 +63,7 @@ export function PhoenixSystemMap() {
             return (
               <line
                 key={product.slug}
-                className={`map-edge map-edge-${product.status}`}
+                className={`map-edge map-edge-${product.status}${dim(product.slug)}`}
                 x1={CX}
                 y1={CY}
                 x2={node.x}
@@ -66,7 +79,7 @@ export function PhoenixSystemMap() {
         {/* Centre: Raven */}
         {/* Classed, not inline-filled: a CSS `fill` beats an SVG fill
             attribute, so the shared .map-node rule would repaint both. */}
-        <Link href={centre?.href ?? "/raven"} className="map-node map-node-centre">
+        <Link href={centre?.href ?? "/raven"} className={`map-node map-node-centre${dim("raven")}`}>
           <circle className="map-halo" cx={CX} cy={CY} r="46" />
           <circle className="map-core" cx={CX} cy={CY} r="9" />
           <text x={CX} y={CY - 20} textAnchor="middle" className="map-node-name">{centre?.name ?? "Raven"}</text>
@@ -82,7 +95,7 @@ export function PhoenixSystemMap() {
             <Link
               key={product.slug}
               href={product.href}
-              className={`map-node map-node-${product.status}`}
+              className={`map-node map-node-${product.status}${dim(product.slug)}`}
             >
               <circle className="map-dot" cx={node.x} cy={node.y} r="7" />
               <text x={node.x} y={node.y - 18} textAnchor={node.anchor} className="map-node-name">
@@ -100,8 +113,8 @@ export function PhoenixSystemMap() {
       </svg>
 
       <figcaption className="system-map-caption">
-        Every Phoenix system reads and writes the same operational model. Mockingbird and Osprey are
-        in service today; Albatross is in development; Peregrine and Owl are research directions.
+        {caption ??
+          "Every Phoenix system reads and writes the same operational model. Mockingbird and Osprey are in service today; Albatross is in development; Peregrine and Owl are research directions."}
       </figcaption>
     </figure>
   );

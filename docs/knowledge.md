@@ -600,3 +600,49 @@ Check `yarn install --immutable` passes locally before enforcing it on a builder
 ### Applies to
 
 `vercel.json`. Generally: confirm which package manager a hosted builder actually ran by reading its version line in the log, rather than inferring it from `packageManager`. A flag that the wrong tool silently drops is worse than one that errors -- the log looks like the guarantee is in force.
+
+## Equal-sized figure cards silently flatten magnitude
+
+<!-- trace:v1 id=FIND-PHO-FLATCARD type=finding state=ACTIVE work=WORK-PHO-45JQ77V3 -->
+
+<!-- trace:inherit FIND-PHO-FLATCARD reason="template section" -->
+### Context
+
+The research pages present sourced figures in a `figure-list` grid: one bordered card per figure, each the same size. It reads as tidy and consistent, and every number carries its source, so it passes every check the repository has.
+
+<!-- trace:inherit FIND-PHO-FLATCARD reason="template section" -->
+### Finding
+
+Equal-sized cards encode every value at identical visual weight, which destroys the one thing a set of figures in a shared unit is there to show. On the operational-spend section the prose argues that agencies already fund this problem and that Phoenix must earn part of existing spend — while rendering `$4.5B` (the CAL FIRE budget) and `$37.1M/yr` (the AI intelligence line) as two identical boxes.
+
+The strongest fact available, that the intelligence line is roughly **0.8%** of the budget it sits inside, was on the page and invisible. The layout was quietly arguing the opposite of the paragraph above it.
+
+Measured across the site: eight of fifteen routes rendered zero graphics, and the two pages carrying the richest sourced data were among them.
+
+<!-- trace:inherit FIND-PHO-FLATCARD reason="template section" -->
+### Evidence
+
+```
+route                                          svg  words  height
+/                                               10    659   6662px
+/resources                                       0    229   2652px
+/resources/wildfire-operational-intelligence     0    498   3740px
+/owl                                             0    247   3011px
+```
+
+`proportionOf(37.1e6, 4.5e9)` → `0.00824`, rendered as a 0.8% sliver once the figures were drawn to scale.
+
+<!-- trace:inherit FIND-PHO-FLATCARD reason="template section" -->
+### Consequence
+
+Where figures share a unit, encode magnitude. Where they do not, cards are fine — the national-scale set mixes a count, an acreage and two dollar figures, so it stays a card grid with the acreage comparison drawn separately.
+
+Two traps found while drawing them, both of which would have introduced a claim the sources do not support:
+
+- **Do not stack what is not one total.** A state budget and a federal request share an axis but not a whole.
+- **Do not number what is not ordered.** A solution's `systems` array is in presentation order; numbering it as a pipeline would have asserted mockingbird → osprey → raven when the real path is mockingbird → raven → osprey.
+
+<!-- trace:inherit FIND-PHO-FLATCARD reason="template section" -->
+### Applies to
+
+Any page presenting several sourced figures. More generally: check that the layout makes the same argument as the prose, because a neutral-looking grid can contradict the sentence above it without anything appearing broken.

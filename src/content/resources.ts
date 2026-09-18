@@ -23,9 +23,18 @@ export const PALISADES: Figure[] = [
 
 export const NATIONAL: Figure[] = [
   { value: "77,850", label: "U.S. wildfires in 2025", source: "Federal fire statistics" },
-  { value: "5.13M acres", label: "burned in 2025 (8.93M in 2024; activity is volatile)", source: "Federal fire statistics" },
+  { value: "5.13M acres", label: "burned in 2025; activity is volatile year to year", source: "Federal fire statistics" },
   { value: "$40B+", label: "annual U.S. wildfire economic losses", source: "Forest Service" },
   { value: "$3B+", label: "average annual federal suppression spend, last decade", source: "Federal land-management agencies" },
+];
+
+/** The two years the national-scale note compares, as data rather than as a
+ *  parenthetical inside a label. Both numbers and the source already appear on
+ *  the page; structuring them lets a visual draw the comparison without
+ *  parsing prose, which would break the moment the sentence is reworded. */
+export const ACREAGE_BY_YEAR: { year: string; value: string; source: string }[] = [
+  { year: "2024", value: "8.93M acres", source: "Federal fire statistics" },
+  { year: "2025", value: "5.13M acres", source: "Federal fire statistics" },
 ];
 
 export const GOVERNMENT_SPEND: Figure[] = [

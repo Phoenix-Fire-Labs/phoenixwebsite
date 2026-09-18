@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { canonicalFor } from "@/lib/seo";
 import { ProductPage } from "@/components/products/ProductPage";
+import { ResearchHorizon } from "@/components/visuals/ResearchHorizon";
 import { productBySlug } from "@/lib/product-status";
 
 const product = productBySlug("peregrine")!;
@@ -16,6 +17,7 @@ export default function PeregrinePage() {
   return (
     <ProductPage
       product={product}
+      visual={<ResearchHorizon name="Peregrine" reads="Raven" constraints={["unit cost", "placement", "power", "reporting"]} />}
       lede="Peregrine explores deployable field sensing: cheaper, more placeable observation nodes that report directly into Raven. It is a research direction, not a product you can buy."
       sections={[
         {

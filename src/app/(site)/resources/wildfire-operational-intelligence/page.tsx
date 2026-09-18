@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { canonicalFor } from "@/lib/seo";
+import { AcreageVolatility } from "@/components/visuals/AcreageVolatility";
+import { MarketSpans } from "@/components/visuals/MarketSpans";
+import { SpendProportion } from "@/components/visuals/SpendProportion";
+import { TamSensitivity } from "@/components/visuals/TamSensitivity";
 import Link from "next/link";
 import {
-  ADJACENT_MARKETS,
-  GOVERNMENT_SPEND,
   NATIONAL,
   PALISADES,
-  TAM_SENSITIVITY,
   type Figure,
 } from "@/content/resources";
 
@@ -70,6 +71,7 @@ export default function ResearchPost() {
             that rests on a single year&apos;s trend line is the wrong argument.
           </p>
         </div>
+        <AcreageVolatility />
         <Figures items={NATIONAL} />
 
         <div className="prose">
@@ -82,7 +84,7 @@ export default function ResearchPost() {
             outcomes.
           </p>
         </div>
-        <Figures items={GOVERNMENT_SPEND} />
+        <SpendProportion />
 
         <div className="prose">
           <h2>Adjacent markets</h2>
@@ -92,55 +94,16 @@ export default function ResearchPost() {
             never be added together.
           </p>
         </div>
-        <div className="table-scroll">
-          <table className="data-table">
-            <caption className="figure-source">
-              Commercial market-research estimates. Overlapping; not additive.
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Adjacent market</th>
-                <th scope="col">Estimate</th>
-                <th scope="col">Relevance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ADJACENT_MARKETS.map((row) => (
-                <tr key={row.market}>
-                  <td>{row.market}</td>
-                  <td>{row.estimate}</td>
-                  <td>{row.relevance}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <MarketSpans />
 
         <div className="prose">
           <h2>TAM sensitivity, not a TAM claim</h2>
           <p>
-            Until pricing is established there is no single defensible number, so the table below is
-            a sensitivity analysis rather than an answer. Base: {TAM_SENSITIVITY.base}.
+            Until pricing is established there is no single defensible number, so the cases below are
+            a sensitivity analysis rather than an answer.
           </p>
         </div>
-        <div className="table-scroll">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th scope="col">Hypothetical average annual contract</th>
-                <th scope="col">Implied department-only ceiling</th>
-              </tr>
-            </thead>
-            <tbody>
-              {TAM_SENSITIVITY.rows.map((row) => (
-                <tr key={row.contract}>
-                  <td>{row.contract}</td>
-                  <td>{row.ceiling}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <TamSensitivity />
 
         <div className="cta-row">
           <Link href="/contact" className="btn btn-primary">Request a Briefing</Link>

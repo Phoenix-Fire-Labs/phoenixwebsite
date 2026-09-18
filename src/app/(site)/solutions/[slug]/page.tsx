@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PhoenixSystemMap } from "@/components/visuals/PhoenixSystemMap";
 import { notFound } from "next/navigation";
 import { canonicalFor } from "@/lib/seo";
 import { SOLUTIONS, findSolution } from "@/content/solutions";
@@ -77,6 +78,14 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
                 }];
           })}
         />
+        <div className="content-container">
+          <div className="reveal" data-i="2">
+            <PhoenixSystemMap
+              engaged={["raven", ...solution.systems.map((system) => system.slug)]}
+              caption={`Highlighted: the systems ${solution.title.toLowerCase()} engages today. The rest of the family is dimmed, not absent — every system reads and writes the same model.`}
+            />
+          </div>
+        </div>
       </section>
 
       <section className="section-pad stagger">

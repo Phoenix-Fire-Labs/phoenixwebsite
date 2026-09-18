@@ -3008,6 +3008,29 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+## Figure visuals read from content, never from literals
+
+The visuals under `src/components/visuals/` that draw numbers — `SpendProportion`,
+`AcreageVolatility`, `MarketSpans`, `TamSensitivity` — take every value from
+`src/content/resources.ts` and derive their geometry with
+`src/lib/figure-scale.ts`. None of them contains a numeric literal from the data.
+
+This is not style. The site's argument rests on every figure carrying its source,
+and a chart with its own copy of a number drifts from the caption printed beside
+it at the first edit. If a visual needs a quantity that is not in `src/content`,
+add it there with its source rather than typing it into the component.
+
+Two shapes are load-bearing and should not be "simplified" later:
+
+- Spend is drawn as magnitudes on a shared axis, never stacked. A state budget
+  and a federal request are not parts of one total, and stacking them would
+  invent a total nobody published.
+- Adjacent markets are drawn as separate spans, never as grouped or stacked
+  bars, because the research note states they overlap and must never be added.
+
+`parseMagnitude` returns `isRange` for a figure like `$76–131B`; a visual that
+collapses a range to a point is misreporting the source.
+
 ## Lint configuration
 
 `.oxlintrc.json` must stay **strict JSON with no comments**. CI validates it

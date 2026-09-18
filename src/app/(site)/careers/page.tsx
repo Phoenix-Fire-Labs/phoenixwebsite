@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
 import { CardGrid } from "@/components/marketing/CardGrid";
+import { PhoenixSystemMap } from "@/components/visuals/PhoenixSystemMap";
 
 export const metadata: Metadata = {
   alternates: canonicalFor("/careers"),
@@ -50,6 +51,13 @@ export default function CareersPage() {
           <h2 className="section-heading reveal" data-i="1">Four areas of work.</h2>
         </div>
         <CardGrid items={AREAS.map((area) => ({ title: area.title, body: area.body }))} />
+        <div className="content-container">
+          <div className="reveal" data-i="2">
+            <PhoenixSystemMap
+              caption="The four areas above map onto these systems. Mockingbird and Osprey are in service, Albatross is in development, and Peregrine and Owl are research directions rather than staffed projects."
+            />
+          </div>
+        </div>
       </section>
 
       <section className="section-pad stagger">

@@ -28,7 +28,7 @@ const ROUTES = [
  *  post, but APIRequestContext does not add it. */
 const ORIGIN = "http://127.0.0.1:3119";
 
-// trace:v1 id=test.e2e-regressions verifies=REQ-PHO-8P8WDXWR,REQ-PHO-XH2DZ7EX,REQ-PHO-K2EA5BTM,REQ-PHO-C4Q5XJHC,REQ-PHO-NRXVT28A,REQ-PHO-3YJG08V6,REQ-PHO-406ZSYBP,REQ-PHO-T9QVXJR8,REQ-PHO-VTA4YYAW exercises=impl.motion-reveal,impl.site-header,impl.site-footer,impl.nav-links,impl.homepage,impl.robots,impl.sitemap,impl.visual-system-map,impl.product-page-shell,impl.raven-page,impl.albatross-page,impl.peregrine-page,impl.owl-page
+// trace:v1 id=test.e2e-regressions verifies=REQ-PHO-8P8WDXWR,REQ-PHO-XH2DZ7EX,REQ-PHO-K2EA5BTM,REQ-PHO-C4Q5XJHC,REQ-PHO-NRXVT28A,REQ-PHO-3YJG08V6,REQ-PHO-406ZSYBP,REQ-PHO-T9QVXJR8,REQ-PHO-VTA4YYAW,REQ-PHO-TQ5N9DVW,REQ-PHO-HS2JV1A4 exercises=impl.motion-reveal,impl.site-header,impl.site-footer,impl.nav-links,impl.homepage,impl.robots,impl.sitemap,impl.visual-system-map,impl.product-page-shell,impl.raven-page,impl.albatross-page,impl.peregrine-page,impl.owl-page,impl.visual-spend-proportion,impl.visual-acreage-volatility,impl.visual-market-spans,impl.visual-tam-sensitivity,impl.visual-research-horizon,impl.visual-solution-matrix
 async function login(page: Page) {
   await page.goto("/login");
   await page.getByLabel("Password").fill("e2e-password");
@@ -366,4 +366,47 @@ test("a throttled briefing is reported, not silently dropped", async ({ page }) 
   }
 
   expect(throttled, "expected a 429 once the budget was exhausted").not.toBeNull();
+});
+
+/** Routes that must carry a graphic. Legal pages and the contact form are
+ *  exempt: a consent notice and a form are text and inputs by nature, and
+ *  decorating them would be the kind of ornament this guard exists to avoid. */
+const TEXT_ONLY_EXEMPT = new Set(["/privacy", "/terms", "/contact"]);
+
+test("every substantive route carries a graphic", async ({ page }) => {
+  await login(page);
+
+  const bare: string[] = [];
+
+  for (const route of ROUTES) {
+    if (TEXT_ONLY_EXEMPT.has(route)) continue;
+
+    await page.goto(route);
+    // Figures are inside .reveal wrappers on several routes, so they have to be
+    // scrolled into view before they are painted.
+    await page.evaluate(() => { window.scrollTo(0, document.body.scrollHeight); });
+    await page.waitForTimeout(250);
+
+    const marks = await page.locator("main svg, main .spend-track, main .acreage-plot, main .matrix-table").count();
+
+    if (marks === 0) bare.push(route);
+  }
+
+  expect(bare, `these routes render no graphic: ${bare.join(", ")}`).toEqual([]);
+});
+
+test("research-status pages promise no schedule", async ({ page }) => {
+  await login(page);
+
+  // The copy on these pages states there is no hardware, pricing or date. A
+  // visual that introduced a quarter, a percentage or a phase would contradict
+  // the sentence printed beside it.
+  const forbidden = /\b(Q[1-4]\s*20\d\d|20\d\d roadmap|phase\s+\d|\d+%\s+complete|coming soon|ship(?:ping|s)\s+in)\b/i;
+
+  for (const route of ["/owl", "/peregrine"]) {
+    await page.goto(route);
+    const text = (await page.locator("main").innerText()).replace(/\s+/g, " ");
+
+    expect(text, `${route} implies a schedule`).not.toMatch(forbidden);
+  }
 });

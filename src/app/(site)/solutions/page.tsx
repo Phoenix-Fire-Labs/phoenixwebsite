@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
+import { SolutionMatrix } from "@/components/visuals/SolutionMatrix";
 import { SOLUTIONS } from "@/content/solutions";
 
 export const metadata: Metadata = {
@@ -21,6 +22,15 @@ export default function SolutionsPage() {
           The same three systems, entered from wherever you sit. Mockingbird reads the radio, Osprey
           holds the picture, and Raven keeps them describing one incident.
         </p>
+      </section>
+
+      <section className="section-pad stagger">
+        <div className="content-container">
+          <p className="section-label reveal" data-i="0">One family, three entrances</p>
+          <div className="reveal" data-i="1">
+            <SolutionMatrix />
+          </div>
+        </div>
       </section>
 
       <section className="section-pad stagger">
