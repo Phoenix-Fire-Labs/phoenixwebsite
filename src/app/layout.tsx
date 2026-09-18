@@ -3,6 +3,7 @@ import { Figtree, Fraunces } from "next/font/google";
 import "./globals.css";
 import { RevealController } from "@/components/motion/RevealController";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 /** Self-hosted at build time. The previous <link> to fonts.googleapis.com
  *  blocked first render on a third-party round-trip and shifted layout when
@@ -99,6 +100,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <RevealController />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
