@@ -99,8 +99,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <RevealController />
-        <Analytics />
-        <SpeedInsights />
+        {/* Both inject scripts from /_vercel/*, which only exist on Vercel's
+            edge. Rendered unconditionally they 404 on every page locally and in
+            CI, and a "Refused to execute script" error on every navigation
+            drowns the console checks that catch real runtime faults. VERCEL is
+            set during a Vercel build, so the deployed output still carries
+            them. */}
+        {process.env.VERCEL ? (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        ) : null}
       </body>
     </html>
   );
