@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { canonicalFor } from "@/lib/seo";
 import { AlbatrossPrediction } from "@/components/visuals/AlbatrossPrediction";
+import { PredictionOrder } from "@/components/visuals/PredictionOrder";
 import { ProductPage } from "@/components/products/ProductPage";
 import { productBySlug } from "@/lib/product-status";
 
@@ -21,6 +22,7 @@ export default function AlbatrossPage() {
       visual={<AlbatrossPrediction />}
       sections={[
         {
+          figure: <PredictionOrder />,
           label: "Where it sits",
           heading: "Prediction needs something to predict from.",
           body: [

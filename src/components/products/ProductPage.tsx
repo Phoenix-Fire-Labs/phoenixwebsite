@@ -9,6 +9,11 @@ export interface ProductSection {
   heading: string;
   body: string[];
   list?: string[];
+  /** Figure for the section's other column. Without one the section renders as
+   *  a single text column, which on a long page leaves the right half of every
+   *  screen empty -- the reason these pages read as sparse regardless of how
+   *  good the copy is. */
+  figure?: ReactNode;
 }
 
 /** Shared shell for every product page.
@@ -46,8 +51,8 @@ export function ProductPage({
         {visual ? <div className="hero-vis">{visual}</div> : null}
       </section>
 
-      {sections.map((section) => (
-        <section key={section.heading} className="section-pad stagger">
+      {sections.map((section, i) => {
+        const copy = (
           <div className="content-container">
             <p className="section-label reveal" data-i="0">{section.label}</p>
             <h2 className="section-heading reveal" data-i="1">{section.heading}</h2>
@@ -60,8 +65,28 @@ export function ProductPage({
               </ul>
             ) : null}
           </div>
-        </section>
-      ))}
+        );
+
+        if (section.figure == null) {
+          return (
+            <section key={section.heading} className="section-pad stagger">
+              {copy}
+            </section>
+          );
+        }
+
+        // Alternate which side the figure sits on so a page with several
+        // figures reads as a rhythm rather than a column of stacked diagrams.
+        return (
+          <section
+            key={section.heading}
+            className={i % 2 === 0 ? "section-pad stagger split-section" : "section-pad stagger split-section reverse"}
+          >
+            {copy}
+            <div className="vis-container reveal" data-i="3">{section.figure}</div>
+          </section>
+        );
+      })}
 
       <section className="section-pad stagger">
         <div className="content-container">

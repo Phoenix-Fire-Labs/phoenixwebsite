@@ -3163,3 +3163,174 @@ main > section + section {
   color: var(--color-text-tertiary);
   white-space: nowrap;
 }
+
+/* ---- Section figures ----------------------------------------------------- */
+
+/* trace:exempt reason=presentational-utilities */
+.contrast, .entity { margin: 0; width: 100%; }
+
+/* trace:exempt reason=presentational-utilities */
+.contrast-svg, .entity-svg { width: 100%; height: auto; }
+
+/* trace:exempt reason=presentational-utilities */
+.contrast-title {
+  font-family: var(--font-body, inherit);
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  fill: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.contrast-title-on { fill: var(--color-accent); }
+
+/* trace:exempt reason=presentational-utilities */
+.contrast-node {
+  font-size: 10px;
+  font-weight: 600;
+  fill: var(--color-text-secondary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.contrast-node-on { fill: var(--color-text); }
+
+/* trace:exempt reason=presentational-utilities */
+.contrast-copy { font-size: 8px; fill: var(--color-text-tertiary); }
+
+/* trace:exempt reason=presentational-utilities */
+.contrast-foot {
+  font-size: 8.5px;
+  font-style: italic;
+  fill: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.contrast-foot-on { fill: var(--color-accent); }
+
+/* trace:exempt reason=presentational-utilities */
+.entity-axis {
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  fill: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.entity-label {
+  font-size: 9.5px;
+  font-weight: 600;
+  fill: var(--color-text);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.entity-caption {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--color-text-tertiary);
+}
+
+.js-anim .contrast-feed {
+  animation: contrast-flow 1400ms linear infinite;
+  stroke-dasharray: 5 5;
+}
+
+@keyframes contrast-flow {
+  from { stroke-dashoffset: 10; }
+  to { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-anim .contrast-feed { animation: none; stroke-dasharray: none; }
+}
+
+/* trace:exempt reason=presentational-utilities */
+.order { margin: 0; width: 100%; }
+
+/* trace:exempt reason=presentational-utilities */
+.order-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.order-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.6rem 1fr;
+  grid-template-areas: "rank name" "rank role" "rank status";
+  gap: 0.15rem 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 3px;
+  background: var(--color-bg);
+}
+
+/* The stage that does not exist yet is drawn as not existing. */
+/* trace:exempt reason=presentational-utilities */
+.order-step-pending {
+  border-style: dashed;
+  border-color: var(--color-text-tertiary);
+  background: transparent;
+}
+
+/* trace:exempt reason=presentational-utilities */
+.order-step + .order-step::before {
+  content: "";
+  position: absolute;
+  top: -0.6rem;
+  left: 1.7rem;
+  width: 1px;
+  height: 0.6rem;
+  background: var(--color-rule);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.order-rank {
+  grid-area: rank;
+  align-self: start;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.order-step-pending .order-rank { color: var(--color-text-tertiary); }
+
+/* trace:exempt reason=presentational-utilities */
+.order-name {
+  grid-area: name;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.order-role {
+  grid-area: role;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.order-status {
+  grid-area: status;
+  margin-top: 0.3rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+/* trace:exempt reason=presentational-utilities */
+.order-caption {
+  margin-top: 1.1rem;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--color-text-tertiary);
+}

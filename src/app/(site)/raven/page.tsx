@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { canonicalFor } from "@/lib/seo";
 import { ProductPage } from "@/components/products/ProductPage";
+import { EntityModel } from "@/components/visuals/EntityModel";
 import { RavenGraph } from "@/components/visuals/RavenGraph";
+import { SharedModelContrast } from "@/components/visuals/SharedModelContrast";
 import { productBySlug } from "@/lib/product-status";
 
 const product = productBySlug("raven")!;
@@ -23,6 +25,7 @@ export default function RavenPage() {
       visual={<RavenGraph />}
       sections={[
         {
+          figure: <SharedModelContrast />,
           label: "What it is",
           heading: "One world, not several databases.",
           body: [
@@ -31,6 +34,11 @@ export default function RavenPage() {
           ],
         },
         {
+          figure: (
+            <EntityModel
+              groups={["Units and people", "Places and terrain", "Incidents and events", "Assets and infrastructure"]}
+            />
+          ),
           label: "What it models",
           heading: "The operational world, made explicit.",
           body: [
