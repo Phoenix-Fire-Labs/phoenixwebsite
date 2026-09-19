@@ -54,16 +54,14 @@ export default async function LoginPage({
       <div className="hero-content">
         <p className="hero-eyebrow">Private Preview</p>
         <h1 className="hero-headline">
-          <span className="line"><span>Hey!</span></span>
           <span className="line"><span>You found us.</span></span>
         </h1>
         <p className="hero-sub">
-          We&apos;re building something pretty awesome, but we aren&apos;t ready to show
-          everyone just yet. Reach out to{" "}
-          <a href="mailto:founders@phoenixfirelabs.com">founders@phoenixfirelabs.com</a>
-          {" "}to learn more, and maybe even get the secret password to our site!
+          We&apos;re building something new at Phoenix Fire Labs, but we&apos;re not
+          quite ready to share it publicly. Want to learn more? Reach out to{" "}
+          <a href="mailto:founders@phoenixfirelabs.com">founders@phoenixfirelabs.com</a>.
         </p>
-        <p className="login-note">Authorized access only.</p>
+        <p className="login-note">Authorized access only</p>
         {params.error === "1" ? (
           <p className="gate-error" role="alert">That password didn&apos;t work. Give it another try.</p>
         ) : null}
