@@ -233,6 +233,25 @@ Two further details, learned by hitting them a second time:
 
 **Evidence is bound to a revision, so ingest last.** `trace evidence ingest --revision <sha>` binds to that exact commit. Finalizing, then making one more commit, re-opens TL021 immediately -- the receipts no longer match HEAD and `trace task finish` blocks again with no new test failure. Do the ingest-and-finish sequence after the final commit of a change set, not in the middle of one.
 
+**`verify` and `task finish` do not check the same thing, and neither prints
+what is blocking.** `trace verify --lifecycle merge` returned `pass` with zero
+diagnostics while `trace task finish` blocked on TL011 and TL110 for the same
+work item, at the same commit, repeatedly. Verify evaluates the changed set;
+the finish gate evaluates the work item's requirement graph, which reaches
+nodes no current diff touches.
+
+Neither command names the offending nodes. They are in the index:
+
+```
+sqlite3 .trace/cache/index.sqlite3 \
+  "select rule_id, trace_id, path from diagnostics;"
+```
+
+Go there first. Bulk-reviewing every node in a file to find the stale one wastes
+a pass and, worse, `trace review` is an assertion that the content is still
+correct -- so reviewing sixteen nodes to fix three means sixteen claims made
+without reading sixteen nodes.
+
 **Stale nodes come from touching the file, not the node.** Appending a new entry to the end of this file staled three unrelated nodes near the top (`ANTI-`, `CONSTRAINT-`, `LEARN-`), because staleness is computed per file rather than per node. `trace review <id>` moves each STALE_REVIEW_REQUIRED node to REVIEWED_NEEDS_VERIFICATION and is a claim that the content is still correct, so read the node before reviewing it -- the whole point is defeated by acknowledging blind.
 
 <!-- trace:inherit CONV-PHO-TP1RBRP1 reason="template section" -->
@@ -646,3 +665,49 @@ Two traps found while drawing them, both of which would have introduced a claim 
 ### Applies to
 
 Any page presenting several sourced figures. More generally: check that the layout makes the same argument as the prose, because a neutral-looking grid can contradict the sentence above it without anything appearing broken.
+
+
+## A saturated machine reports as test failures, not as load
+
+<!-- trace:v1 id=FIND-PHO-LOADMASK type=finding state=ACTIVE work=WORK-PHO-45JQ77V3 -->
+
+<!-- trace:inherit FIND-PHO-LOADMASK reason="template section" -->
+### Context
+
+The e2e suite began failing locally on a branch whose previous commit had passed 25/25. Four tests failed, including two that had just been written, which is exactly the pattern of a real regression in new code.
+
+<!-- trace:inherit FIND-PHO-LOADMASK reason="template section" -->
+### Finding
+
+None of the four had failed an assertion. Each had hit its timeout after 15 to 31 **minutes**. Run serially the same four passed in 15 to 19 seconds each.
+
+The machine's load average was **92**. Six orphaned Python `multiprocessing` workers, reparented to `launchd` after their parent died, were holding roughly 330% CPU across two days. Playwright with five workers could not get scheduled. Once those processes were gone, load fell to 2.95 and the full suite finished in about two minutes.
+
+Playwright reports a starved worker and a broken assertion through the same red mark, and the duration is the only thing distinguishing them. A failure measured in minutes is a scheduling problem; a real assertion failure resolves in seconds.
+
+<!-- trace:inherit FIND-PHO-LOADMASK reason="template section" -->
+### Evidence
+
+```
+✘ each route declares its own canonical                 (15.7m)
+✘ research-status pages promise no schedule             (30.9m)
+✘ every substantive route carries a graphic             (30.9m)
+
+$ uptime
+load averages: 55.66 92.24 92.01
+
+# same four, --workers=1, after the orphans were gone
+✓ 4 passed (1.3m)
+```
+
+<!-- trace:inherit FIND-PHO-LOADMASK reason="template section" -->
+### Consequence
+
+Read the failure duration before reading the failure. If tests are timing out rather than asserting, run `uptime` before touching the code -- a suite that passed at the previous commit and now times out has almost certainly not developed a logic fault.
+
+Self-inflicted variant worth avoiding: launching a second suite while one is still running in the background produces the same symptom, because two five-worker runs plus two `yarn build && yarn start` servers oversubscribe the machine by themselves.
+
+<!-- trace:inherit FIND-PHO-LOADMASK reason="template section" -->
+### Applies to
+
+Any local run of the e2e suite, and any conclusion drawn from one. More generally: before reporting a test result, confirm the run was given the resources to produce one -- and never report a partially complete run as though it were a result.
