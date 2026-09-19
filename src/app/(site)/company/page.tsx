@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
+import { AudienceRoutes } from "@/components/visuals/AudienceRoutes";
 import { FoundersTimeline } from "@/components/visuals/FoundersTimeline";
 
 export const metadata: Metadata = {
@@ -106,7 +107,10 @@ export default function CompanyPage() {
               improving outcomes, not by inventing a new budget line.
             </p>
           </div>
-          <div className="cta-row reveal" data-i="2">
+          <div className="reveal" data-i="2">
+            <AudienceRoutes />
+          </div>
+          <div className="cta-row reveal" data-i="3">
             <Link href="/contact" className="btn btn-primary">Request a Briefing</Link>
             <Link href="/careers" className="btn btn-secondary">See open roles</Link>
           </div>

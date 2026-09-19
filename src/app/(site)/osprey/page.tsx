@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { canonicalFor } from "@/lib/seo";
 import Link from "next/link";
+import { LayerStack } from "@/components/visuals/LayerStack";
 import { OspreyOperationalMap } from "@/components/visuals/OspreyOperationalMap";
 import { WildfireContourMap } from "@/components/visuals/WildfireContourMap";
 
@@ -82,6 +83,9 @@ export default function OspreyPage() {
             </div>
           ))}
         </dl>
+        <div className="content-container reveal" data-i="6">
+          <LayerStack layers={LAYERS.map((layer) => layer.name)} />
+        </div>
         <p className="section-body">
           Assembly is the product, not display. The question Osprey answers is not
           &ldquo;can you show me this layer&rdquo; but &ldquo;what is true about this incident right
