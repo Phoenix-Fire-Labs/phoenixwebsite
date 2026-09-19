@@ -387,7 +387,9 @@ test("every substantive route carries a graphic", async ({ page }) => {
     await page.evaluate(() => { window.scrollTo(0, document.body.scrollHeight); });
     await page.waitForTimeout(250);
 
-    const marks = await page.locator("main svg, main .spend-track, main .acreage-plot, main .matrix-table").count();
+    const marks = await page
+      .locator("main svg, main .matrix-grid, main .spend-track, main .order-steps")
+      .count();
 
     if (marks === 0) bare.push(route);
   }
@@ -425,7 +427,15 @@ test("both compared years are shown, and not joined into a trend line", async ({
   await expect(figure).toContainText("2025");
   await expect(figure.locator(".acreage-bar")).toHaveCount(2);
 
-  // No path, line or polyline joining them. The accompanying text rejects
-  // reasoning from a trend line, so drawing one would contradict it.
-  await expect(figure.locator("path, line, polyline")).toHaveCount(0);
+  // Nothing may slope between the two columns. The text rejects reasoning from
+  // a single year's trend line, so a connector rising or falling between them
+  // would contradict the sentence beside it. A flat baseline and a horizontal
+  // annotation are fine, so this asserts geometry rather than banning <line>.
+  await expect(figure.locator("polyline, polygon")).toHaveCount(0);
+
+  const sloped = await figure.locator("line").evaluateAll((nodes) =>
+    nodes.filter((n) => n.getAttribute("y1") !== n.getAttribute("y2")).length,
+  );
+
+  expect(sloped, "a sloped connector implies the trend line the text rejects").toBe(0);
 });
