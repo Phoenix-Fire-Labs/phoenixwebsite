@@ -26,7 +26,7 @@ origin.intent = "BugHunt only ever ran on a developer machine, so the analyzers 
 origin.session = "default"
 [work."WORK-PHO-45JQ77V3"]
 title = "Give every page its own visual argument"
-status = "active"
+status = "done"
 origin.source = "feature_extension"
 origin.intent = "Eight of fifteen pages render zero graphics, and the pages carrying the strongest quantitative evidence present it as flat equal-sized boxes, so the proportions that make the argument are invisible. Give each page a visual that carries meaning rather than decoration, driven by data already sourced in the repository."
 origin.session = "default"
