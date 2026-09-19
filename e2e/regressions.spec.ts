@@ -28,7 +28,7 @@ const ROUTES = [
  *  post, but APIRequestContext does not add it. */
 const ORIGIN = "http://127.0.0.1:3119";
 
-// trace:v1 id=test.e2e-regressions verifies=REQ-PHO-8P8WDXWR,REQ-PHO-XH2DZ7EX,REQ-PHO-K2EA5BTM,REQ-PHO-C4Q5XJHC,REQ-PHO-NRXVT28A,REQ-PHO-3YJG08V6,REQ-PHO-406ZSYBP,REQ-PHO-T9QVXJR8,REQ-PHO-VTA4YYAW,REQ-PHO-TQ5N9DVW,REQ-PHO-HS2JV1A4 exercises=impl.motion-reveal,impl.site-header,impl.site-footer,impl.nav-links,impl.homepage,impl.robots,impl.sitemap,impl.visual-system-map,impl.product-page-shell,impl.raven-page,impl.albatross-page,impl.peregrine-page,impl.owl-page,impl.visual-spend-proportion,impl.visual-acreage-volatility,impl.visual-market-spans,impl.visual-tam-sensitivity,impl.visual-research-horizon,impl.visual-solution-matrix
+// trace:v1 id=test.e2e-regressions verifies=REQ-PHO-8P8WDXWR,REQ-PHO-XH2DZ7EX,REQ-PHO-K2EA5BTM,REQ-PHO-C4Q5XJHC,REQ-PHO-NRXVT28A,REQ-PHO-3YJG08V6,REQ-PHO-406ZSYBP,REQ-PHO-T9QVXJR8,REQ-PHO-VTA4YYAW,REQ-PHO-TQ5N9DVW,REQ-PHO-HS2JV1A4,REQ-PHO-QFMRA2KE exercises=impl.motion-reveal,impl.site-header,impl.site-footer,impl.nav-links,impl.homepage,impl.robots,impl.sitemap,impl.visual-system-map,impl.product-page-shell,impl.raven-page,impl.albatross-page,impl.peregrine-page,impl.owl-page,impl.visual-spend-proportion,impl.visual-acreage-volatility,impl.visual-market-spans,impl.visual-tam-sensitivity,impl.visual-research-horizon,impl.visual-solution-matrix
 async function login(page: Page) {
   await page.goto("/login");
   await page.getByLabel("Password").fill("e2e-password");
@@ -409,4 +409,23 @@ test("research-status pages promise no schedule", async ({ page }) => {
 
     expect(text, `${route} implies a schedule`).not.toMatch(forbidden);
   }
+});
+
+test("both compared years are shown, and not joined into a trend line", async ({ page }) => {
+  await login(page);
+  await page.goto("/resources");
+
+  const figure = page.locator(".acreage");
+
+  await figure.scrollIntoViewIfNeeded();
+
+  // Both years in one encoding: the argument is that activity is volatile, and
+  // a single year cannot show volatility.
+  await expect(figure).toContainText("2024");
+  await expect(figure).toContainText("2025");
+  await expect(figure.locator(".acreage-bar")).toHaveCount(2);
+
+  // No path, line or polyline joining them. The accompanying text rejects
+  // reasoning from a trend line, so drawing one would contradict it.
+  await expect(figure.locator("path, line, polyline")).toHaveCount(0);
 });

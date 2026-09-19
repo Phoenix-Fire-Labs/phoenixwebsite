@@ -9,6 +9,7 @@ const TRACE_IDS = {
   "e2e/a11y.spec.ts": "test.e2e-a11y",
   "e2e/regressions.spec.ts": "test.e2e-regressions",
   "src/proxy.test.ts": "test.preview-gate-fail-closed",
+  "src/lib/figure-scale.test.ts": "test.figure-scale",
 };
 
 // Playwright writes the basename; vitest writes the repo-relative path.
