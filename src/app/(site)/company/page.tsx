@@ -46,38 +46,38 @@ export default function CompanyPage() {
         </p>
       </section>
 
-      <section className="section-pad stagger">
-        <div className="split-section">
-          <div className="content-container">
-            <p className="section-label reveal" data-i="0">Founded in fire</p>
-            <h2 className="section-heading reveal" data-i="1">The Palisades Fire, January 2025.</h2>
-            <dl className="figure-list reveal" data-i="2">
-              {PALISADES.map((item) => (
-                <div key={item.label}>
-                  <dt>{item.value}</dt>
-                  <dd>
-                    {item.label}
-                    <span className="figure-source">Source: CAL FIRE completed damage assessment</span>
-                  </dd>
-                </div>
-              ))}
-            </dl>
-            <div className="prose reveal" data-i="3">
-              <p>
-                Phoenix Fire Labs was founded by Carter LaSalle and Jack Phelps after losing their
-                homes in the Palisades Fire.
-              </p>
-              <p>
-                The experience exposed how difficult it can be to assemble a clear picture of a
-                fast-moving incident while information is arriving through radio traffic, maps,
-                evacuation systems, imagery, and separate operational feeds. None of those systems
-                was wrong. None of them could see the others.
-              </p>
-            </div>
-          </div>
-          <div className="vis-container reveal" data-i="4">
+      <section className="section-pad stagger founded-section">
+        <div className="content-container">
+          <p className="section-label reveal" data-i="0">Founded in fire</p>
+          <h2 className="section-heading reveal" data-i="1">The Palisades Fire, January 2025.</h2>
+        </div>
+        <div className="split-section founded-split">
+          <dl className="figure-list reveal" data-i="2">
+            {PALISADES.map((item) => (
+              <div key={item.label}>
+                <dt>{item.value}</dt>
+                <dd>
+                  {item.label}
+                  <span className="figure-source">Source: CAL FIRE completed damage assessment</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <div className="vis-container reveal" data-i="3">
             <FoundersTimeline />
           </div>
+        </div>
+        <div className="content-container prose reveal" data-i="4">
+          <p>
+            Phoenix Fire Labs was founded by Carter LaSalle and Jack Phelps after losing their
+            homes in the Palisades Fire.
+          </p>
+          <p>
+            The experience exposed how difficult it can be to assemble a clear picture of a
+            fast-moving incident while information is arriving through radio traffic, maps,
+            evacuation systems, imagery, and separate operational feeds. None of those systems
+            was wrong. None of them could see the others.
+          </p>
         </div>
       </section>
 

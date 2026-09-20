@@ -3,9 +3,13 @@
  *  Restores the golden master's draw-in choreography (timeline rule, then each
  *  marker's tick, spark and label, then the connecting arcs), which the first
  *  Next port dropped. All of it is scoped to `.js-anim`, so the diagram renders
- *  complete and static without JavaScript or under reduced motion. */
+ *  complete and static without JavaScript or under reduced motion.
+ *
+ *  viewBox is cropped to the drawn content — a 400×300 frame left a tall empty
+ *  band above and below the rule when the SVG sat in a split column. */
 // trace:v1 id=impl.visual-founders-timeline work=WORK-PHO-18KENMFK satisfies=REQ-PHO-8P8WDXWR
 export function FoundersTimeline() {
+  const Y = 70;
   const marks = [
     { x: 90, step: 1, when: "Jan 2025", what: "Palisades Fire", accent: true, spark: true },
     { x: 200, step: 2, when: "Nov 2025", what: "Phoenix Founded", accent: false, spark: false },
@@ -15,16 +19,16 @@ export function FoundersTimeline() {
   return (
     <svg
       className="founders-timeline"
-      viewBox="0 0 400 300"
+      viewBox="0 0 400 140"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label="Phoenix founding timeline: Palisades Fire January 2025, Phoenix founded November 2025, developing prototype today"
     >
-      <path className="tl-rule" d="M 40 150 L 360 150" stroke="var(--color-rule)" strokeWidth="1" pathLength={1} />
+      <path className="tl-rule" d={`M 40 ${String(Y)} L 360 ${String(Y)}`} stroke="var(--color-rule)" strokeWidth="1" pathLength={1} />
 
       {marks.map((mark) => (
-        <g key={mark.what} transform={`translate(${String(mark.x)}, 150)`} className={`tl-mark tl-mark-${String(mark.step)}`}>
+        <g key={mark.what} transform={`translate(${String(mark.x)}, ${String(Y)})`} className={`tl-mark tl-mark-${String(mark.step)}`}>
           <line className="tl-tick" x1="0" y1="-20" x2="0" y2="20" stroke="var(--color-rule)" strokeWidth="1" pathLength={1} />
           {mark.spark ? <circle className="tl-halo" cx="0" cy="0" r="16" fill="var(--color-accent-faint)" /> : null}
           <circle
@@ -53,7 +57,7 @@ export function FoundersTimeline() {
 
       <path
         className="tl-arc tl-arc-1"
-        d="M 90 150 C 120 95 170 95 200 150"
+        d={`M 90 ${String(Y)} C 120 25 170 25 200 ${String(Y)}`}
         stroke="var(--color-accent)"
         strokeWidth="1.5"
         strokeDasharray="4 6"
@@ -62,7 +66,7 @@ export function FoundersTimeline() {
       />
       <path
         className="tl-arc tl-arc-2"
-        d="M 200 150 C 235 95 285 95 320 150"
+        d={`M 200 ${String(Y)} C 235 25 285 25 320 ${String(Y)}`}
         stroke="var(--color-accent)"
         strokeWidth="1.5"
         fill="none"

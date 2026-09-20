@@ -81,6 +81,7 @@ export function PhoenixSystemMap({
             attribute, so the shared .map-node rule would repaint both. */}
         <Link href={centre?.href ?? "/raven"} className={`map-node map-node-centre${dim("raven")}`}>
           <circle className="map-halo" cx={CX} cy={CY} r="46" />
+          <circle className="map-pulse-ring" cx={CX} cy={CY} r="22" />
           <circle className="map-core" cx={CX} cy={CY} r="9" />
           <text x={CX} y={CY - 20} textAnchor="middle" className="map-node-name">{centre?.name ?? "Raven"}</text>
           <text x={CX} y={CY + 30} textAnchor="middle" className="map-node-role">shared model</text>
@@ -95,7 +96,7 @@ export function PhoenixSystemMap({
             <Link
               key={product.slug}
               href={product.href}
-              className={`map-node map-node-${product.status}${dim(product.slug)}`}
+              className={`map-node map-node-${product.status} map-ring-${node.ring}${dim(product.slug)}`}
             >
               <circle className="map-dot" cx={node.x} cy={node.y} r="7" />
               <text x={node.x} y={node.y - 18} textAnchor={node.anchor} className="map-node-name">

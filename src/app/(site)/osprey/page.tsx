@@ -83,14 +83,18 @@ export default function OspreyPage() {
             </div>
           ))}
         </dl>
-        <div className="content-container reveal" data-i="6">
-          <LayerStack layers={LAYERS.map((layer) => layer.name)} />
+        <div className="split-section layers-assembly">
+          <div className="vis-container reveal" data-i="6">
+            <LayerStack layers={LAYERS.map((layer) => layer.name)} />
+          </div>
+          <div className="content-container reveal" data-i="7">
+            <p className="section-body">
+              Assembly is the product, not display. The question Osprey answers is not
+              &ldquo;can you show me this layer&rdquo; but &ldquo;what is true about this incident right
+              now, across everything we know.&rdquo;
+            </p>
+          </div>
         </div>
-        <p className="section-body">
-          Assembly is the product, not display. The question Osprey answers is not
-          &ldquo;can you show me this layer&rdquo; but &ldquo;what is true about this incident right
-          now, across everything we know.&rdquo;
-        </p>
       </section>
 
       <section className="section-pad stagger">

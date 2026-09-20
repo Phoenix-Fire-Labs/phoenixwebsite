@@ -39,10 +39,6 @@ export default function TechnologyPage() {
             incidents, events, assets, infrastructure, observations, relationships, and time, so
             radio understanding and geospatial context refer to the same operational world.
           </p>
-          <p className="note">
-            Powered by Raven. It is the layer beneath Mockingbird and Osprey, not a product sold
-            separately.
-          </p>
           <div className="cta-row">
             <Link href="/contact" className="btn btn-primary">Request a Briefing</Link>
             <a href="#albatross" className="btn btn-secondary">What comes next ↓</a>
