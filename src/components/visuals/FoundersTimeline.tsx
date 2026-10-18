@@ -10,6 +10,7 @@
 // trace:v1 id=impl.visual-founders-timeline work=WORK-PHO-18KENMFK satisfies=REQ-PHO-8P8WDXWR
 export function FoundersTimeline() {
   const Y = 70;
+
   const marks = [
     { x: 90, step: 1, when: "Jan 2025", what: "Palisades Fire", accent: true, spark: true },
     { x: 200, step: 2, when: "Nov 2025", what: "Phoenix Founded", accent: false, spark: false },
