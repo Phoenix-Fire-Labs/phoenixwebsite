@@ -19,12 +19,12 @@
     "next": "16.3.8",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "zod": "^4.6.5"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.13.0",
+    "@axe-core/playwright": "^4.14.0",
     "@oxlint/plugins": "1.83.0",
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
@@ -33,14 +33,14 @@
     "knip": "^6.41.0",
     "lighthouse": "^13.5.0",
     "madge": "^8.0.0",
-    "oxlint": "1.83.0",
+    "oxlint": "1.88.0",
     "oxlint-tsgolint": "^7.0.2004",
     "playwright-core": "1.63.0",
     "publint": "^0.3.24",
     "react-doctor": "^0.9.14",
     "tailwindcss": "4.3.3",
     "typescript": "7.0.2",
-    "vite": "8.3.0",
-    "vitest": "5.0.1"
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
   }
 }
