@@ -37,7 +37,7 @@
     "oxlint-tsgolint": "^7.0.2004",
     "playwright-core": "1.63.0",
     "publint": "^0.3.24",
-    "react-doctor": "^0.9.14",
+    "react-doctor": "^0.9.18",
     "tailwindcss": "4.3.3",
     "typescript": "7.0.2",
     "vite": "8.3.0",
