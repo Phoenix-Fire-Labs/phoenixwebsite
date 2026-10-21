@@ -4864,7 +4864,7 @@ __metadata:
     next: "npm:16.3.8"
     oxlint: "npm:1.83.0"
     oxlint-tsgolint: "npm:^7.0.2004"
-    playwright-core: "npm:1.63.0"
+    playwright-core: "npm:1.64.1"
     publint: "npm:^0.3.24"
     react: "npm:19.3.0"
     react-doctor: "npm:^0.9.14"
@@ -4897,6 +4897,15 @@ __metadata:
   bin:
     playwright-core: cli.js
   checksum: 10c0/39c1ebae4029ca2e9371e00a5588d962038e24b6e0bdb7d0d27374dde04838f349b83ae0c8b3b648653d0935cba7fb9011f1201adaab9dd0db7801ad6c75e9aa
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:1.64.1":
+  version: 1.64.1
+  resolution: "playwright-core@npm:1.64.1"
+  bin:
+    playwright-core: cli.js
+  checksum: 10c0/91c4f5ed1cff4b0e18b6ac62f66770f5f1b6c204d4aebd6a321c07466dca18a70822ac692597c6059705a703f9768097ac551df179fb49294d639509148e04f3
   languageName: node
   linkType: hard
 
