@@ -4626,9 +4626,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oxlint-plugin-react-doctor@npm:0.9.14":
-  version: 0.9.14
-  resolution: "oxlint-plugin-react-doctor@npm:0.9.14"
+"oxlint-plugin-react-doctor@npm:0.9.18":
+  version: 0.9.18
+  resolution: "oxlint-plugin-react-doctor@npm:0.9.18"
   dependencies:
     "@shaderfrog/glsl-parser": "npm:^7.0.1"
     "@typescript-eslint/types": "npm:^8.59.3"
@@ -4636,7 +4636,7 @@ __metadata:
     eslint-visitor-keys: "npm:^5.0.1"
     lightningcss: "npm:^1.33.0"
     oxc-parser: "npm:^0.148.0"
-  checksum: 10c0/225cfd762fe5726d4e8ec63e86c3c8fa9321c670c35c4f6b7b833625c1c37707f7cc1b2d25850d9be192fefb928a13929bdaeb4801a124dcf7c96961cf3fd410
+  checksum: 10c0/e7bb57bcba328c2e5f11afc79f4d83892d5c844da47ea2b3f9c06897742d3cc70f793489d56f0fc35a34d18b596c4071bb6bf236d050168138894b26d72638b3
   languageName: node
   linkType: hard
 
@@ -4867,7 +4867,7 @@ __metadata:
     playwright-core: "npm:1.63.0"
     publint: "npm:^0.3.24"
     react: "npm:19.3.0"
-    react-doctor: "npm:^0.9.14"
+    react-doctor: "npm:^0.9.18"
     react-dom: "npm:19.3.0"
     tailwindcss: "npm:4.3.3"
     typescript: "npm:7.0.2"
@@ -5053,9 +5053,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-doctor@npm:^0.9.14":
-  version: 0.9.14
-  resolution: "react-doctor@npm:0.9.14"
+"react-doctor@npm:^0.9.18":
+  version: 0.9.18
+  resolution: "react-doctor@npm:0.9.18"
   dependencies:
     "@astrojs/compiler": "npm:^4.0.0"
     "@sentry/node": "npm:^10.54.0"
@@ -5070,7 +5070,7 @@ __metadata:
     oxc-parser: "npm:^0.148.0"
     oxc-resolver: "npm:^11.24.2"
     oxlint: "npm:>=1.81.0 <1.82.0"
-    oxlint-plugin-react-doctor: "npm:0.9.14"
+    oxlint-plugin-react-doctor: "npm:0.9.18"
     playwright-core: "npm:^1.62.1"
     prompts: "npm:^2.4.2"
     typescript: "npm:>=5.0.4 <6"
@@ -5078,7 +5078,7 @@ __metadata:
     yoga-layout: "npm:~3.2.1"
   bin:
     react-doctor: bin/react-doctor.js
-  checksum: 10c0/98677c92df8a9bef59c803514a5c6bccc9e312e112663683147d70596dbe7b6ba2e00fd7e7185debf0949b30435acd239245cb68875030b58b3132a85ffb0112
+  checksum: 10c0/b318ee3fad0044d77e6313cff95b123104612d051bb12bd16e9b69d4849477482424e061b5f6f19e55664f1fc885503e1b891e33325be20d56cbd86dc32a373a
   languageName: node
   linkType: hard
 
