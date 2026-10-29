@@ -26,6 +26,8 @@ permissions:
   security-events: write
   # Read commit contents
   contents: read
+  # Required by the v2 reusable scanner for artifact and code-scanning access
+  actions: read
 
 jobs:
   scan-scheduled:
