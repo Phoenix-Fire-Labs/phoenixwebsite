@@ -448,6 +448,120 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* ─── MOCKINGBIRD: traffic under load ─── */
+    .mb-divider {
+      height: 1px;
+      background: var(--rule);
+      max-width: 56rem;
+      margin: clamp(3.5rem, 7vw, 5rem) 0;
+    }
+
+    .mb-sub {
+      font-family: var(--font-display);
+      font-size: clamp(1.375rem, 2.4vw, 1.875rem);
+      font-weight: 650;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .mb-points {
+      list-style: none;
+      margin-top: clamp(1.75rem, 3vw, 2.25rem);
+      display: grid;
+      gap: 1.125rem;
+      max-width: 46ch;
+    }
+    .mb-points li {
+      padding-left: 1rem;
+      border-left: 2px solid var(--accent-faint);
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      color: var(--text-mid);
+    }
+    .mb-points strong {
+      display: block;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .queue {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--rule);
+    }
+
+    .queue-head,
+    .queue-foot {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+    }
+    .queue-head { justify-content: space-between; border-bottom: 1px solid var(--rule); }
+    .queue-foot { flex-wrap: wrap; border-top: 1px solid var(--rule); }
+
+    .queue-live { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--accent); }
+    .queue-live::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: queuePulse 2.4s ease-in-out infinite;
+    }
+
+    .queue-row {
+      display: grid;
+      grid-template-columns: 3.75rem 1fr;
+      gap: 0.3rem 0.75rem;
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .queue-row:last-of-type { border-bottom: 0; }
+    .queue-row.is-emergency { background: var(--accent-faint); }
+
+    .queue-chan {
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      color: var(--text-tertiary);
+      padding-top: 0.2rem;
+    }
+    .queue-row.is-emergency .queue-chan { color: var(--accent); }
+
+    .queue-msg { font-size: 0.875rem; line-height: 1.45; color: var(--text); }
+
+    .queue-flag {
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-right: 0.35rem;
+    }
+
+    .queue-status {
+      grid-column: 2;
+      font-size: 0.75rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-tertiary);
+    }
+    .queue-status.is-urgent { color: var(--accent); font-weight: 600; }
+    .queue-status.is-open { color: var(--accent-warm); font-weight: 600; }
+
+    .queue-chip {
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      padding: 0.2rem 0.4rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
     /* ─── Platform ─── */
     .capabilities {
       list-style: none;
@@ -581,6 +695,8 @@
       100% { transform: scale(2); opacity: 0; }
     }
 
+    @keyframes queuePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
     /* ─── Scroll Reveal ─── */
     .reveal {
       opacity: 0;
@@ -611,6 +727,7 @@
       .data-point { animation: none; opacity: 1; transform: none; }
       .point-ring { animation: none; opacity: 0; }
       .live-dot { animation: none; }
+      .queue-live::before { animation: none; }
       .section-line line { stroke-dashoffset: 0; }
 
       .reveal { transition: opacity 200ms; transform: none !important; }
@@ -876,8 +993,9 @@
       <h2 class="mb-name reveal" style="--i:1">MOCKINGBIRD</h2>
       <p class="mb-desc reveal" style="--i:2">
         An AI-powered wildfire communications engine that performs real-time
-        speech-to-structure on tactical VHF traffic, extracting location, unit,
-        and event signals and synchronizing them to geospatial command views.
+        speech-to-structure on tactical VHF traffic. It extracts location, unit,
+        and event signals into geospatial command views, and it holds the radio
+        net itself in order, so that nothing asked for on air goes unanswered.
       </p>
       <div class="flow stagger">
         <div class="flow-step reveal" style="--i:3">
@@ -934,6 +1052,76 @@
           </div>
           <span class="flow-title">Synchronize</span>
           <span class="flow-desc">Push structured updates to geospatial command views</span>
+        </div>
+      </div>
+
+      <div class="mb-divider reveal" style="--i:7"></div>
+
+      <div class="split-section stagger">
+        <div class="content-container">
+          <h3 class="mb-sub reveal" style="--i:0">When the Radio Saturates</h3>
+          <p class="section-body reveal" style="--i:1">
+            At the peak of an incident the net floods. Requests arrive faster than one
+            operator can hold in their head, and the most urgent are not always the
+            loudest. Mockingbird carries that load, so the incident commander can see
+            what has been asked, what has been answered, and what is still waiting.
+          </p>
+          <ul class="mb-points reveal" style="--i:2">
+            <li>
+              <strong>Urgency first</strong>
+              Emergency traffic moves to the top of the queue the moment it is heard.
+            </li>
+            <li>
+              <strong>Open until answered</strong>
+              A request for a water tender stays on the board until it is acknowledged
+              and dispatched.
+            </li>
+            <li>
+              <strong>Every channel at once</strong>
+              Air-to-ground, command, and law enforcement nets monitored in parallel.
+            </li>
+          </ul>
+        </div>
+
+        <div class="vis-container reveal" style="--i:3">
+          <div class="queue">
+            <div class="queue-head">
+              <span>Inject queue</span>
+              <span class="queue-live">Live</span>
+            </div>
+
+            <div class="queue-row is-emergency">
+              <span class="queue-chan">TAC 2</span>
+              <p class="queue-msg"><span class="queue-flag">Emergency</span>Mayday, firefighter down, Division Alpha</p>
+              <span class="queue-status is-urgent">Acknowledged 0:08</span>
+            </div>
+
+            <div class="queue-row">
+              <span class="queue-chan">CMD</span>
+              <p class="queue-msg">Engine 41 requesting water tender, Ridge Road</p>
+              <span class="queue-status">Dispatched 1:12</span>
+            </div>
+
+            <div class="queue-row">
+              <span class="queue-chan">AIR</span>
+              <p class="queue-msg">Helicopter 3 requesting bucket drop, east flank</p>
+              <span class="queue-status">Acknowledged 0:46</span>
+            </div>
+
+            <div class="queue-row">
+              <span class="queue-chan">LAW</span>
+              <p class="queue-msg">Deputy requesting evacuation escort, Zone 4</p>
+              <span class="queue-status is-open">Open 2:30</span>
+            </div>
+
+            <div class="queue-foot">
+              <span class="queue-chip">CMD</span>
+              <span class="queue-chip">TAC 2</span>
+              <span class="queue-chip">AIR/GROUND</span>
+              <span class="queue-chip">LAW</span>
+              <span class="queue-chip">MUTUAL AID</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
