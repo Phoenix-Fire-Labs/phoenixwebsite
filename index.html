@@ -9,7 +9,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Phoenix Fire Labs | Real-Time Wildfire Intelligence</title>
-  <meta name="description" content="Phoenix Fire Labs builds AI systems that convert live wildfire radio traffic into actionable map intelligence in seconds, helping command teams make faster, safer decisions.">
+  <meta name="description" content="Phoenix Fire Labs builds AI that keeps wildfire radio traffic under control: what has been asked, what has been answered, and where it is on the map.">
   <meta name="keywords" content="wildfire, intelligence, AI, command teams, mapping, fire maps, real-time fire tracking, Phoenix Fire Labs, firefighting technology">
   <meta name="author" content="Phoenix Fire Labs">
   <meta name="robots" content="index, follow">
@@ -18,14 +18,14 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.phoenixfirelabs.com/">
   <meta property="og:title" content="Phoenix Fire Labs | Real-Time Wildfire Intelligence">
-  <meta property="og:description" content="Phoenix Fire Labs builds AI systems that convert live wildfire radio traffic into actionable map intelligence in seconds, helping command teams make faster, safer decisions.">
+  <meta property="og:description" content="Phoenix Fire Labs builds AI that keeps wildfire radio traffic under control: what has been asked, what has been answered, and where it is on the map.">
   <meta property="og:image" content="https://www.phoenixfirelabs.com/og-image.jpg">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://www.phoenixfirelabs.com/">
   <meta name="twitter:title" content="Phoenix Fire Labs | Real-Time Wildfire Intelligence">
-  <meta name="twitter:description" content="Phoenix Fire Labs builds AI systems that convert live wildfire radio traffic into actionable map intelligence in seconds, helping command teams make faster, safer decisions.">
+  <meta name="twitter:description" content="Phoenix Fire Labs builds AI that keeps wildfire radio traffic under control: what has been asked, what has been answered, and where it is on the map.">
   <meta name="twitter:image" content="https://www.phoenixfirelabs.com/twitter-image.jpg">
 
   <link rel="canonical" href="https://www.phoenixfirelabs.com/">
@@ -275,6 +275,8 @@
       margin-bottom: clamp(1.25rem, 2.5vw, 2rem);
     }
 
+    .section-body + .section-body { margin-top: 1.125rem; }
+
     .section-body {
       font-size: clamp(0.9375rem, 1.3vw, 1rem);
       line-height: 1.75;
@@ -448,6 +450,127 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* ─── MOCKINGBIRD: traffic under load ─── */
+    .mockingbird .mb-sub + .flow { margin-top: clamp(1.75rem, 3vw, 2.5rem); }
+
+    .mb-divider {
+      height: 1px;
+      background: var(--rule);
+      max-width: 56rem;
+      margin: clamp(3.5rem, 7vw, 5rem) 0;
+    }
+
+    .mb-sub {
+      font-family: var(--font-display);
+      font-size: clamp(1.375rem, 2.4vw, 1.875rem);
+      font-weight: 650;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .mb-points {
+      list-style: none;
+      margin-top: clamp(1.75rem, 3vw, 2.25rem);
+      display: grid;
+      gap: 1.125rem;
+      max-width: 46ch;
+    }
+    .mb-points li {
+      padding-left: 1rem;
+      border-left: 2px solid var(--accent-faint);
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      color: var(--text-mid);
+    }
+    .mb-points strong {
+      display: block;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .queue {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--rule);
+    }
+
+    .queue-head,
+    .queue-foot {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+    }
+    .queue-head { justify-content: space-between; border-bottom: 1px solid var(--rule); }
+    .queue-foot { flex-wrap: wrap; border-top: 1px solid var(--rule); }
+
+    .queue-live { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--accent); }
+    .queue-live::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: queuePulse 2.4s ease-in-out infinite;
+    }
+
+    .queue-row {
+      display: grid;
+      grid-template-columns: 3.75rem 1fr;
+      gap: 0.3rem 0.75rem;
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .queue-row + .queue-foot { border-top: 0; }
+    .queue-row.is-emergency { background: var(--accent-faint); }
+
+    .queue-chan {
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      color: var(--text-tertiary);
+      padding-top: 0.2rem;
+    }
+    .queue-row.is-emergency .queue-chan { color: var(--accent); }
+
+    .queue-msg { font-size: 0.875rem; line-height: 1.45; color: var(--text); }
+
+    .queue-flag {
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-right: 0.35rem;
+    }
+
+    .queue-status {
+      grid-column: 2;
+      font-size: 0.75rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-tertiary);
+    }
+    .queue-status.is-open { color: var(--accent); font-weight: 600; }
+
+    .queue-chip {
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      padding: 0.2rem 0.4rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .latency-vis {
+      margin-top: clamp(2.5rem, 5vw, 3.5rem);
+      max-width: 420px;
+      justify-self: start;
+    }
+
     /* ─── Platform ─── */
     .capabilities {
       list-style: none;
@@ -581,6 +704,8 @@
       100% { transform: scale(2); opacity: 0; }
     }
 
+    @keyframes queuePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
     /* ─── Scroll Reveal ─── */
     .reveal {
       opacity: 0;
@@ -611,6 +736,8 @@
       .data-point { animation: none; opacity: 1; transform: none; }
       .point-ring { animation: none; opacity: 0; }
       .live-dot { animation: none; }
+      .queue-live::before { animation: none; }
+      .sat-mark, .sat-open { animation: none; opacity: 1; transform: none; }
       .section-line line { stroke-dashoffset: 0; }
 
       .reveal { transition: opacity 200ms; transform: none !important; }
@@ -675,10 +802,9 @@
           <span class="line"><span>for Incident Command</span></span>
         </h1>
         <p class="hero-sub">
-          Phoenix Fire Labs builds AI systems that convert live wildfire radio
-          traffic into actionable map intelligence in seconds, helping command
-          teams make faster, safer decisions when conditions are changing by
-          the minute.
+          During a major incident the radio net floods. Phoenix Fire Labs builds
+          AI that keeps it in order, so nothing asked for on air goes unanswered.
+          The same traffic becomes a live command map, in seconds.
         </p>
         <div class="hero-inception">
           <img
@@ -794,77 +920,123 @@
             <line x1="0" y1="1" x2="48" y2="1" stroke="var(--accent)" stroke-width="2" pathLength="1"/>
           </svg>
           <blockquote class="problem-pull reveal" style="--i:1">
-            Critical updates trapped in voice traffic and manual logs, a dangerous
-            delay between what crews report and what command can <em>see</em>.
+            Four channels. One operator. More traffic than anyone can
+            <em>hold</em>.
           </blockquote>
           <p class="section-body reveal" style="--i:2">
-            During major incidents, critical updates are often trapped in voice
-            traffic and manual logs, creating a dangerous delay between what crews
-            report and what command can see. Phoenix Fire Labs is building
-            MOCKINGBIRD, an AI-powered wildfire communications engine that listens
-            to tactical VHF channels, transcribes radio traffic in real time,
-            extracts key operational signals (locations, unit references, incident
-            events), and pushes structured updates into map-centric command workflows.
+            During a major incident the radio does not stop. Requests, status
+            updates and emergencies arrive on several channels at once.
           </p>
-          <p class="goal-line reveal" style="--i:3">
-            Our goal is simple: reduce radio-to-map latency from
-            <strong>hours</strong> to <strong>seconds</strong>.
+          <p class="section-body reveal" style="--i:3">
+            One person has to catch all of it, and remember what is still
+            outstanding. Under that load, things get missed.
+          </p>
+          <p class="goal-line reveal" style="--i:4">
+            Our goal is simple: solve inject handling and reduce radio-to-map
+            latency from <strong>hours</strong> to <strong>seconds</strong>.
           </p>
         </div>
-        <div class="vis-container reveal" style="--i:4" aria-hidden="true">
-          <svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div class="vis-container reveal" style="--i:5">
+          <svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Radio traffic rising across four channels, with unanswered requests building up as the incident escalates">
             <style>
-              .latency-line {
-                stroke-dasharray: 4 6;
-                animation: dashFlow 20s linear infinite;
-              }
-              .latency-fast {
-                stroke-dasharray: 4 6;
-                animation: dashFlow 2s linear infinite;
-              }
-              @keyframes dashFlow {
-                to { stroke-dashoffset: -100; }
-              }
-              .pulse-node {
-                animation: livePulse 2s ease-in-out infinite;
-              }
+              .sat-mark { animation: satIn 500ms var(--ease-out-quart) backwards; }
+              .sat-open { animation: satPulse 2.6s ease-in-out infinite; }
+              @keyframes satIn { from { opacity: 0; transform: scaleY(0.2); } }
+              @keyframes satPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
             </style>
-            <!-- Background Grid -->
-            <path d="M0 50h400M0 150h400M0 250h400" stroke="var(--rule)" stroke-width="0.5" stroke-dasharray="2 6"/>
-            
-            <!-- Old Way: Hours -->
-            <text x="0" y="30" fill="var(--text-tertiary)" font-family="Figtree" font-size="12" font-weight="600" letter-spacing="0.1em">THE OLD WAY: HOURS</text>
-            
-            <!-- Nodes -->
-            <circle cx="20" cy="80" r="6" fill="var(--text-tertiary)"/>
-            <circle cx="140" cy="80" r="6" fill="var(--text-tertiary)"/>
-            <circle cx="260" cy="80" r="6" fill="var(--text-tertiary)"/>
-            <circle cx="380" cy="80" r="6" fill="var(--text-tertiary)"/>
-            
-            <!-- Slow Lines -->
-            <path d="M 30 80 L 130 80" stroke="var(--text-tertiary)" stroke-width="1.5" class="latency-line"/>
-            <path d="M 150 80 L 250 80" stroke="var(--text-tertiary)" stroke-width="1.5" class="latency-line"/>
-            <path d="M 270 80 L 370 80" stroke="var(--text-tertiary)" stroke-width="1.5" class="latency-line"/>
-            
-            <!-- Labels -->
-            <text x="20" y="110" fill="var(--text-secondary)" font-family="Figtree" font-size="10" text-anchor="middle">Radio</text>
-            <text x="140" y="110" fill="var(--text-secondary)" font-family="Figtree" font-size="10" text-anchor="middle">Log</text>
-            <text x="260" y="110" fill="var(--text-secondary)" font-family="Figtree" font-size="10" text-anchor="middle">Review</text>
-            <text x="380" y="110" fill="var(--text-secondary)" font-family="Figtree" font-size="10" text-anchor="middle">Map</text>
-            
-            <!-- New Way: Seconds -->
-            <text x="0" y="190" fill="var(--accent)" font-family="Figtree" font-size="12" font-weight="600" letter-spacing="0.1em">PHOENIX: SECONDS</text>
-            
-            <circle cx="20" cy="240" r="6" fill="var(--accent)"/>
-            <circle cx="380" cy="240" r="6" fill="var(--accent)" class="pulse-node"/>
-            
-            <!-- Fast Line -->
-            <path d="M 30 240 L 370 240" stroke="var(--accent)" stroke-width="2" class="latency-fast"/>
-            
-            <!-- Labels -->
-            <text x="20" y="270" fill="var(--accent)" font-family="Figtree" font-size="10" text-anchor="middle" font-weight="600">Radio</text>
-            <text x="200" y="230" fill="var(--accent)" font-family="Figtree" font-size="10" text-anchor="middle" font-weight="600">AI Extraction</text>
-            <text x="380" y="270" fill="var(--accent)" font-family="Figtree" font-size="10" text-anchor="middle" font-weight="600">Map</text>
+            <!-- CMD -->
+            <text x="0" y="74" fill="var(--text-tertiary)" font-family="Figtree" font-size="8" font-weight="600" letter-spacing="0.06em">CMD</text>
+            <line x1="44" y1="70" x2="388" y2="70" stroke="var(--rule)" stroke-width="1"/>
+            <rect class="sat-mark" x="52" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.34s"/>
+            <rect class="sat-mark" x="82" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.39s"/>
+            <rect class="sat-mark" x="110" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.43s"/>
+            <rect class="sat-mark" x="136" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.48s"/>
+            <rect class="sat-mark" x="160" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.52s"/>
+            <rect class="sat-mark" x="182" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.57s"/>
+            <rect class="sat-mark" x="202" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.61s"/>
+            <rect class="sat-mark" x="220" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.66s"/>
+            <rect class="sat-mark" x="237" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.70s"/>
+            <rect class="sat-mark" x="252" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.75s"/>
+            <rect class="sat-mark" x="266" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.79s"/>
+            <rect class="sat-mark" x="279" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.84s"/>
+            <rect class="sat-mark" x="291" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.89s"/>
+            <rect class="sat-mark" x="302" y="64" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.93s"/>
+            <rect class="sat-mark sat-open" x="312" y="62" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 0.97s"/>
+            <rect class="sat-mark sat-open" x="322" y="62" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.02s"/>
+            <rect class="sat-mark sat-open" x="331" y="62" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.06s"/>
+            <rect class="sat-mark sat-open" x="340" y="62" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.11s"/>
+            <!-- TAC 2 -->
+            <text x="0" y="119" fill="var(--text-tertiary)" font-family="Figtree" font-size="8" font-weight="600" letter-spacing="0.06em">TAC 2</text>
+            <line x1="44" y1="115" x2="388" y2="115" stroke="var(--rule)" stroke-width="1"/>
+            <rect class="sat-mark" x="58" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.34s"/>
+            <rect class="sat-mark" x="88" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.39s"/>
+            <rect class="sat-mark" x="116" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.43s"/>
+            <rect class="sat-mark" x="142" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.48s"/>
+            <rect class="sat-mark" x="166" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.52s"/>
+            <rect class="sat-mark" x="188" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.57s"/>
+            <rect class="sat-mark" x="208" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.61s"/>
+            <rect class="sat-mark" x="226" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.66s"/>
+            <rect class="sat-mark" x="243" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.70s"/>
+            <rect class="sat-mark" x="258" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.75s"/>
+            <rect class="sat-mark" x="272" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.79s"/>
+            <rect class="sat-mark" x="285" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.84s"/>
+            <rect class="sat-mark" x="297" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.89s"/>
+            <rect class="sat-mark" x="308" y="110" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.93s"/>
+            <rect class="sat-mark sat-open" x="318" y="108" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 0.97s"/>
+            <rect class="sat-mark sat-open" x="328" y="108" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.02s"/>
+            <rect class="sat-mark sat-open" x="337" y="108" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.06s"/>
+            <rect class="sat-mark sat-open" x="346" y="108" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.11s"/>
+            <!-- AIR -->
+            <text x="0" y="164" fill="var(--text-tertiary)" font-family="Figtree" font-size="8" font-weight="600" letter-spacing="0.06em">AIR</text>
+            <line x1="44" y1="160" x2="388" y2="160" stroke="var(--rule)" stroke-width="1"/>
+            <rect class="sat-mark" x="55" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.34s"/>
+            <rect class="sat-mark" x="85" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.39s"/>
+            <rect class="sat-mark" x="113" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.43s"/>
+            <rect class="sat-mark" x="139" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.48s"/>
+            <rect class="sat-mark" x="163" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.52s"/>
+            <rect class="sat-mark" x="185" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.57s"/>
+            <rect class="sat-mark" x="205" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.61s"/>
+            <rect class="sat-mark" x="223" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.66s"/>
+            <rect class="sat-mark" x="240" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.70s"/>
+            <rect class="sat-mark" x="255" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.75s"/>
+            <rect class="sat-mark" x="269" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.79s"/>
+            <rect class="sat-mark" x="282" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.84s"/>
+            <rect class="sat-mark" x="294" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.89s"/>
+            <rect class="sat-mark" x="305" y="154" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.93s"/>
+            <rect class="sat-mark sat-open" x="315" y="152" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 0.97s"/>
+            <rect class="sat-mark sat-open" x="325" y="152" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.02s"/>
+            <rect class="sat-mark sat-open" x="334" y="152" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.06s"/>
+            <rect class="sat-mark sat-open" x="343" y="152" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.11s"/>
+            <!-- LAW -->
+            <text x="0" y="209" fill="var(--text-tertiary)" font-family="Figtree" font-size="8" font-weight="600" letter-spacing="0.06em">LAW</text>
+            <line x1="44" y1="205" x2="388" y2="205" stroke="var(--rule)" stroke-width="1"/>
+            <rect class="sat-mark" x="61" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.34s"/>
+            <rect class="sat-mark" x="91" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.39s"/>
+            <rect class="sat-mark" x="119" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.43s"/>
+            <rect class="sat-mark" x="145" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.48s"/>
+            <rect class="sat-mark" x="169" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.52s"/>
+            <rect class="sat-mark" x="191" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.57s"/>
+            <rect class="sat-mark" x="211" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.61s"/>
+            <rect class="sat-mark" x="229" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.66s"/>
+            <rect class="sat-mark" x="246" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.70s"/>
+            <rect class="sat-mark" x="261" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.75s"/>
+            <rect class="sat-mark" x="275" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.79s"/>
+            <rect class="sat-mark" x="288" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.84s"/>
+            <rect class="sat-mark" x="300" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.89s"/>
+            <rect class="sat-mark" x="311" y="200" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5" style="animation-delay: 0.93s"/>
+            <rect class="sat-mark sat-open" x="321" y="198" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 0.97s"/>
+            <rect class="sat-mark sat-open" x="331" y="198" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.02s"/>
+            <rect class="sat-mark sat-open" x="340" y="198" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.06s"/>
+            <rect class="sat-mark sat-open" x="349" y="198" width="3" height="15" rx="1.5" fill="var(--accent)" opacity="1" style="animation-delay: 1.11s"/>
+            <!-- time axis -->
+            <line x1="44" y1="240" x2="388" y2="240" stroke="var(--rule)" stroke-width="1"/>
+            <text x="44" y="256" fill="var(--text-tertiary)" font-family="Figtree" font-size="8">Incident start</text>
+            <text x="388" y="256" fill="var(--text-tertiary)" font-family="Figtree" font-size="8" text-anchor="end">Peak</text>
+            <!-- legend -->
+            <rect x="44" y="277" width="3" height="11" rx="1.5" fill="var(--text-tertiary)" opacity="0.5"/>
+            <text x="54" y="286" fill="var(--text-tertiary)" font-family="Figtree" font-size="8">Answered</text>
+            <rect x="116" y="275" width="3" height="15" rx="1.5" fill="var(--accent)"/>
+            <text x="126" y="286" fill="var(--accent)" font-family="Figtree" font-size="8" font-weight="600">Still open</text>
           </svg>
         </div>
       </div>
@@ -875,10 +1047,80 @@
       <div class="section-label reveal" style="--i:0">Our Core System</div>
       <h2 class="mb-name reveal" style="--i:1">MOCKINGBIRD</h2>
       <p class="mb-desc reveal" style="--i:2">
-        An AI-powered wildfire communications engine that performs real-time
-        speech-to-structure on tactical VHF traffic, extracting location, unit,
-        and event signals and synchronizing them to geospatial command views.
+        Mockingbird listens to tactical VHF traffic in real time. It keeps the net
+        in order, so nothing asked for on air goes unanswered. It turns the same
+        traffic into a live command map.
       </p>
+      <div class="split-section stagger">
+        <div class="content-container">
+          <h3 class="mb-sub reveal" style="--i:0">When the Radio Saturates</h3>
+          <p class="section-body reveal" style="--i:1">
+            Mockingbird puts every request on one board. The most urgent rise to the
+            top. Nothing leaves the board until someone answers it.
+          </p>
+          <ul class="mb-points reveal" style="--i:2">
+            <li>
+              <strong>Urgency first</strong>
+              Emergency traffic moves to the top of the queue the moment it is heard.
+            </li>
+            <li>
+              <strong>Open until answered</strong>
+              A request for a water tender stays on the board until it is acknowledged
+              and dispatched.
+            </li>
+            <li>
+              <strong>Every channel at once</strong>
+              Air-to-ground, command, and law enforcement nets monitored in parallel.
+            </li>
+          </ul>
+        </div>
+
+        <div class="vis-container reveal" style="--i:3">
+          <div class="queue">
+            <div class="queue-head">
+              <span>Inject queue</span>
+              <span class="queue-live">Live</span>
+            </div>
+
+            <div class="queue-row is-emergency">
+              <span class="queue-chan">TAC 2</span>
+              <p class="queue-msg"><span class="queue-flag">Emergency</span>Mayday, firefighter down, Division Alpha</p>
+              <span class="queue-status">Acknowledged 0:08</span>
+            </div>
+
+            <div class="queue-row">
+              <span class="queue-chan">CMD</span>
+              <p class="queue-msg">Engine 41 requesting water tender, Ridge Road</p>
+              <span class="queue-status">Dispatched 1:12</span>
+            </div>
+
+            <div class="queue-row">
+              <span class="queue-chan">AIR</span>
+              <p class="queue-msg">Helicopter 3 requesting bucket drop, east flank</p>
+              <span class="queue-status">Acknowledged 0:46</span>
+            </div>
+
+            <div class="queue-row">
+              <span class="queue-chan">LAW</span>
+              <p class="queue-msg">Deputy requesting evacuation escort, Zone 4</p>
+              <span class="queue-status is-open">Open 2:30</span>
+            </div>
+
+            <div class="queue-foot">
+              <span class="queue-chip">CMD</span>
+              <span class="queue-chip">TAC 2</span>
+              <span class="queue-chip">AIR/GROUND</span>
+              <span class="queue-chip">LAW</span>
+              <span class="queue-chip">MUTUAL AID</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-divider reveal" style="--i:7"></div>
+
+      <h3 class="mb-sub reveal" style="--i:8">From Radio to Map in Seconds</h3>
+
       <div class="flow stagger">
         <div class="flow-step reveal" style="--i:3">
           <div class="flow-icon">
@@ -936,6 +1178,64 @@
           <span class="flow-desc">Push structured updates to geospatial command views</span>
         </div>
       </div>
+
+      <div class="vis-container latency-vis reveal" style="--i:9" aria-hidden="true">
+          <svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <style>
+              .latency-line {
+                stroke-dasharray: 4 6;
+                animation: dashFlow 20s linear infinite;
+              }
+              .latency-fast {
+                stroke-dasharray: 4 6;
+                animation: dashFlow 2s linear infinite;
+              }
+              @keyframes dashFlow {
+                to { stroke-dashoffset: -100; }
+              }
+              .pulse-node {
+                animation: livePulse 2s ease-in-out infinite;
+              }
+            </style>
+            <!-- Background Grid -->
+            <path d="M0 50h400M0 150h400M0 250h400" stroke="var(--rule)" stroke-width="0.5" stroke-dasharray="2 6"/>
+            
+            <!-- Old Way: Hours -->
+            <text x="0" y="30" fill="var(--text-tertiary)" font-family="Figtree" font-size="12" font-weight="600" letter-spacing="0.1em">THE OLD WAY: HOURS</text>
+            
+            <!-- Nodes -->
+            <circle cx="20" cy="80" r="6" fill="var(--text-tertiary)"/>
+            <circle cx="140" cy="80" r="6" fill="var(--text-tertiary)"/>
+            <circle cx="260" cy="80" r="6" fill="var(--text-tertiary)"/>
+            <circle cx="380" cy="80" r="6" fill="var(--text-tertiary)"/>
+            
+            <!-- Slow Lines -->
+            <path d="M 30 80 L 130 80" stroke="var(--text-tertiary)" stroke-width="1.5" class="latency-line"/>
+            <path d="M 150 80 L 250 80" stroke="var(--text-tertiary)" stroke-width="1.5" class="latency-line"/>
+            <path d="M 270 80 L 370 80" stroke="var(--text-tertiary)" stroke-width="1.5" class="latency-line"/>
+            
+            <!-- Labels -->
+            <text x="20" y="110" fill="var(--text-secondary)" font-family="Figtree" font-size="10" text-anchor="middle">Radio</text>
+            <text x="140" y="110" fill="var(--text-secondary)" font-family="Figtree" font-size="10" text-anchor="middle">Log</text>
+            <text x="260" y="110" fill="var(--text-secondary)" font-family="Figtree" font-size="10" text-anchor="middle">Review</text>
+            <text x="380" y="110" fill="var(--text-secondary)" font-family="Figtree" font-size="10" text-anchor="middle">Map</text>
+            
+            <!-- New Way: Seconds -->
+            <text x="0" y="190" fill="var(--accent)" font-family="Figtree" font-size="12" font-weight="600" letter-spacing="0.1em">PHOENIX: SECONDS</text>
+            
+            <circle cx="20" cy="240" r="6" fill="var(--accent)"/>
+            <circle cx="380" cy="240" r="6" fill="var(--accent)" class="pulse-node"/>
+            
+            <!-- Fast Line -->
+            <path d="M 30 240 L 370 240" stroke="var(--accent)" stroke-width="2" class="latency-fast"/>
+            
+            <!-- Labels -->
+            <text x="20" y="270" fill="var(--accent)" font-family="Figtree" font-size="10" text-anchor="middle" font-weight="600">Radio</text>
+            <text x="200" y="230" fill="var(--accent)" font-family="Figtree" font-size="10" text-anchor="middle" font-weight="600">AI Extraction</text>
+            <text x="380" y="270" fill="var(--accent)" font-family="Figtree" font-size="10" text-anchor="middle" font-weight="600">Map</text>
+          </svg>
+        </div>
+
     </section>
 
     <!-- ════ Platform ════ -->
@@ -951,8 +1251,8 @@
             field utility.
           </p>
           <ul class="capabilities reveal" style="--i:3">
-            <li>Faster situational awareness during rapidly evolving incidents</li>
             <li>Reduced analyst burden during peak radio traffic</li>
+            <li>Faster situational awareness during rapidly evolving incidents</li>
             <li>Clearer decision support for resource allocation under pressure</li>
           </ul>
         </div>
@@ -1019,9 +1319,9 @@
           </svg>
           <h2 class="section-heading reveal" style="--i:1">Founded in Fire</h2>
           <p class="founders-text reveal" style="--i:2">
-            Phoenix Fire Labs was founded by Carter LaSalle (Notre Dame) and
-            Jack Phelps (Princeton), who lost their homes in the 2025 Palisades
-            Fire. We are building this because we've lived the consequences of
+            Phoenix Fire Labs was founded by Jack Phelps (Princeton) and
+            Carter LaSalle (Notre Dame), who lost their homes in the 2025
+            Palisades Fire. We are building this because we've lived the consequences of
             delayed fireground intelligence, and we believe modern AI infrastructure
             can materially improve outcomes for firefighters and communities.
           </p>
