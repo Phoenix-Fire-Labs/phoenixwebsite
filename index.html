@@ -78,6 +78,7 @@
 
     /* ─── Header ─── */
     .site-header {
+      min-height: 5.5rem;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -125,6 +126,8 @@
 
     /* ─── Hero ─── */
     .hero {
+      min-height: calc(100vh - 5.5rem);
+      min-height: calc(100svh - 5.5rem);
       display: grid;
       grid-template-columns: 1.15fr 0.85fr;
       gap: clamp(2rem, 4vw, 4rem);
@@ -244,6 +247,13 @@
       padding: clamp(3.5rem, 8vw, 6rem) clamp(1.5rem, 5vw, 4rem);
     }
 
+    .problem {
+      min-height: calc(100vh - 5.5rem);
+      min-height: calc(100svh - 5.5rem);
+      display: grid;
+      align-content: center;
+    }
+
     .section-line {
       width: 48px;
       height: 2px;
@@ -350,7 +360,7 @@
       line-height: 1.75;
       color: var(--text-mid);
       max-width: 60ch;
-      margin-bottom: clamp(3rem, 6vw, 4.5rem);
+      margin-bottom: clamp(1.5rem, 3vw, 2rem);
     }
 
     .flow {
@@ -451,14 +461,17 @@
     }
 
     /* ─── MOCKINGBIRD: traffic under load ─── */
-    .mockingbird .mb-sub + .flow { margin-top: clamp(1.75rem, 3vw, 2.5rem); }
-
-    .mb-divider {
-      height: 1px;
-      background: var(--rule);
-      max-width: 56rem;
-      margin: clamp(3.5rem, 7vw, 5rem) 0;
+    .mb-process {
+      margin-top: clamp(4rem, 8vw, 6rem);
+      padding-top: clamp(3.5rem, 7vw, 5rem);
+      border-top: 1px solid var(--rule);
     }
+
+    .mb-process .flow {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+    .mb-process .flow::before { display: none; }
 
     .mb-sub {
       font-family: var(--font-display);
@@ -566,9 +579,8 @@
     }
 
     .latency-vis {
-      margin-top: clamp(2.5rem, 5vw, 3.5rem);
       max-width: 420px;
-      justify-self: start;
+      justify-self: center;
     }
 
     /* ─── Platform ─── */
@@ -768,16 +780,7 @@
     }
 
     @media (max-width: 768px) {
-      .flow {
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem 1.25rem;
-      }
-      .flow::before { display: none; }
       .site-footer { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 480px) {
-      .flow { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -1044,15 +1047,15 @@
 
     <!-- ════ MOCKINGBIRD ════ -->
     <section class="mockingbird section-pad stagger">
-      <div class="section-label reveal" style="--i:0">Our Core System</div>
-      <h2 class="mb-name reveal" style="--i:1">MOCKINGBIRD</h2>
-      <p class="mb-desc reveal" style="--i:2">
-        Mockingbird listens to tactical VHF traffic in real time. It keeps the net
-        in order, so nothing asked for on air goes unanswered. It turns the same
-        traffic into a live command map.
-      </p>
       <div class="split-section stagger">
         <div class="content-container">
+          <div class="section-label reveal" style="--i:0">Our Core System</div>
+          <h2 class="mb-name reveal" style="--i:1">MOCKINGBIRD</h2>
+          <p class="mb-desc reveal" style="--i:2">
+            Mockingbird listens to tactical VHF traffic in real time. It keeps the net
+            in order, so nothing asked for on air goes unanswered. It turns the same
+            traffic into a live command map.
+          </p>
           <h3 class="mb-sub reveal" style="--i:0">When the Radio Saturates</h3>
           <p class="section-body reveal" style="--i:1">
             Mockingbird puts every request on one board. The most urgent rise to the
@@ -1117,11 +1120,11 @@
         </div>
       </div>
 
-      <div class="mb-divider reveal" style="--i:7"></div>
+      <div class="split-section mb-process">
+        <div class="content-container">
+          <h3 class="mb-sub reveal" style="--i:8">From Radio to Map in Seconds</h3>
 
-      <h3 class="mb-sub reveal" style="--i:8">From Radio to Map in Seconds</h3>
-
-      <div class="flow stagger">
+          <div class="flow stagger">
         <div class="flow-step reveal" style="--i:3">
           <div class="flow-icon">
             <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
@@ -1178,6 +1181,7 @@
           <span class="flow-desc">Push structured updates to geospatial command views</span>
         </div>
       </div>
+        </div>
 
       <div class="vis-container latency-vis reveal" style="--i:9" aria-hidden="true">
           <svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1235,6 +1239,7 @@
             <text x="380" y="270" fill="var(--accent)" font-family="Figtree" font-size="10" text-anchor="middle" font-weight="600">Map</text>
           </svg>
         </div>
+      </div>
 
     </section>
 
